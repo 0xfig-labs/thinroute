@@ -11,8 +11,8 @@ import (
 
 	"github.com/goccy/go-json"
 
-	"github.com/icehugh/thinroute/internal/storage"
-	"github.com/icehugh/thinroute/internal/storage/sqlutil"
+	"github.com/0xfig-labs/thinroute/internal/storage"
+	"github.com/0xfig-labs/thinroute/internal/storage/sqlutil"
 )
 
 // SQLite has a default limit of 999 bindable parameters per query (SQLITE_MAX_VARIABLE_NUMBER).

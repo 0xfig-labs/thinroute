@@ -8,7 +8,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 
-	"github.com/icehugh/thinroute/internal/llmclient"
+	"github.com/0xfig-labs/thinroute/internal/llmclient"
 )
 
 // Prometheus metrics for LLM gateway observability

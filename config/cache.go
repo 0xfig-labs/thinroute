@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"os"
-
 )
 
 // CacheConfig holds model and response cache configuration.
@@ -15,9 +14,9 @@ type CacheConfig struct {
 // ModelCacheConfig holds cache configuration for model registry.
 // Uses local file cache.
 type ModelCacheConfig struct {
-	RefreshInterval int             `yaml:"refresh_interval" env:"CACHE_REFRESH_INTERVAL"`
-	RecheckInterval int             `yaml:"recheck_interval" env:"PROVIDER_RECHECK_INTERVAL"`
-	ModelList       ModelListConfig `yaml:"model_list"`
+	RefreshInterval int               `yaml:"refresh_interval" env:"CACHE_REFRESH_INTERVAL"`
+	RecheckInterval int               `yaml:"recheck_interval" env:"PROVIDER_RECHECK_INTERVAL"`
+	ModelList       ModelListConfig   `yaml:"model_list"`
 	Local           *LocalCacheConfig `yaml:"local"`
 }
 
@@ -26,6 +25,7 @@ type ModelListConfig struct {
 	// URL is the HTTP(S) URL to fetch models.json from (empty = disabled)
 	URL string `yaml:"url" env:"MODEL_LIST_URL"`
 }
+
 // LocalCacheConfig holds local file cache configuration.
 type LocalCacheConfig struct {
 	CacheDir string `yaml:"cache_dir" env:"THINROUTE_CACHE_DIR"`
@@ -41,7 +41,6 @@ type SimpleCacheConfig struct {
 	Enabled *bool `yaml:"enabled"`
 	TTL     int   `yaml:"ttl"` // cache TTL in seconds; 0 = default (1 hour)
 }
-
 
 // ValidateCacheConfig validates the cache configuration in c.
 func ValidateCacheConfig(c *CacheConfig) error {

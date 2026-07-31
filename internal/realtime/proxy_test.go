@@ -12,7 +12,7 @@ import (
 
 	"github.com/coder/websocket"
 
-	"github.com/icehugh/thinroute/internal/realtime"
+	"github.com/0xfig-labs/thinroute/internal/realtime"
 )
 
 func wsURL(httpURL string) string {

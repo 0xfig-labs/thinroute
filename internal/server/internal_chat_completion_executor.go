@@ -12,11 +12,11 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/icehugh/thinroute/internal/auditlog"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/gateway"
-	"github.com/icehugh/thinroute/internal/responsecache"
-	"github.com/icehugh/thinroute/internal/usage"
+	"github.com/0xfig-labs/thinroute/internal/auditlog"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/gateway"
+	"github.com/0xfig-labs/thinroute/internal/responsecache"
+	"github.com/0xfig-labs/thinroute/internal/usage"
 )
 
 // InternalChatCompletionExecutorConfig configures the transport-free translated

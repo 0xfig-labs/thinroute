@@ -10,10 +10,10 @@ import (
 
 	"github.com/labstack/echo/v5"
 
-	"github.com/icehugh/thinroute/internal/auditlog"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/streaming"
-	"github.com/icehugh/thinroute/internal/usage"
+	"github.com/0xfig-labs/thinroute/internal/auditlog"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/streaming"
+	"github.com/0xfig-labs/thinroute/internal/usage"
 )
 
 var defaultEnabledPassthroughProviders = []string{"openai", "anthropic", "openrouter", "zai", "vllm", "deepseek"}

@@ -3,7 +3,7 @@ package modeldata
 import (
 	"regexp"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // terminalReleaseDateSuffixPatterns are intentionally broad because provider

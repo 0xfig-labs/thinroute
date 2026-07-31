@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 func createConversation(t *testing.T, srv *Server, body string) core.Conversation {

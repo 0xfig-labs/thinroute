@@ -16,9 +16,9 @@ import (
 
 	"github.com/labstack/echo/v5"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/httpclient"
-	"github.com/icehugh/thinroute/internal/realtime"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/httpclient"
+	"github.com/0xfig-labs/thinroute/internal/realtime"
 )
 
 // realtimeCallsPath labels usage entries and Location headers for WebRTC calls.
@@ -113,7 +113,6 @@ func (s *realtimeService) RealtimeClientSecrets(c *echo.Context) error {
 		return handleError(c, err)
 	}
 	route.endpoint = "/v1/realtime/client_secrets"
-
 
 	// Route on the resolved selector: an alias never reaches the provider lookup.
 	target, err := router.RealtimeClientSecretTarget(ctx, &core.RealtimeRequest{Model: route.selector.Model, Provider: route.selector.Provider})

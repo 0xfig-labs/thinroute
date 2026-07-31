@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/providers"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/providers"
 )
 
 // RealtimeTarget implements core.RealtimeProvider for xAI's Voice Agent API

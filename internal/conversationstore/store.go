@@ -11,7 +11,7 @@ import (
 
 	"github.com/goccy/go-json"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // ErrNotFound indicates a requested conversation was not found.

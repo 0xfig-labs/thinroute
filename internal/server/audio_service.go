@@ -9,9 +9,9 @@ import (
 
 	"github.com/labstack/echo/v5"
 
-	"github.com/icehugh/thinroute/internal/auditlog"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/usage"
+	"github.com/0xfig-labs/thinroute/internal/auditlog"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/usage"
 )
 
 // audioService adapts Echo requests to the model-routed audio provider for the

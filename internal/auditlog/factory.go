@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/icehugh/thinroute/config"
+	"github.com/0xfig-labs/thinroute/config"
 )
+
 // Result holds the initialized audit logger and its dependencies.
 // The caller is responsible for calling Close() to release resources.
 type Result struct {
@@ -41,7 +42,6 @@ func New(ctx context.Context, cfg *config.Config) (*Result, error) {
 		Logger: NewLogger(logCfg),
 	}, nil
 }
-
 
 // buildLoggerConfig creates an auditlog.Config from config.LogConfig.
 func buildLoggerConfig(logCfg config.LogConfig) Config {

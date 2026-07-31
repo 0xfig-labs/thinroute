@@ -3,7 +3,7 @@ package virtualmodels
 import (
 	"strings"
 
-	"github.com/icehugh/thinroute/config"
+	"github.com/0xfig-labs/thinroute/config"
 )
 
 // ConfigModels converts declarative config.yaml / VIRTUAL_MODELS entries into

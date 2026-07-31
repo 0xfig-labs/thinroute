@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/modelselectors"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/modelselectors"
 )
 
 // resolvedTarget is one redirect destination with its selector parsed at build

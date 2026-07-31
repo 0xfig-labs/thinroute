@@ -4,8 +4,8 @@ import (
 	"context"
 	"io"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/usage"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/usage"
 )
 
 // RouteGate reports whether a provider/model route currently has rate-limit

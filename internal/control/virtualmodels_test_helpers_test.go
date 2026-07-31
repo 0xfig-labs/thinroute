@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/virtualmodels"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/virtualmodels"
 )
 
 type vmTestStore struct {

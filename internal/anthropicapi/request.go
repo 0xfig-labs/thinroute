@@ -8,7 +8,7 @@ import (
 
 	"github.com/goccy/go-json"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // DecodeMessagesRequest parses an Anthropic Messages API request body.

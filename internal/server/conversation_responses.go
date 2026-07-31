@@ -8,8 +8,8 @@ import (
 
 	"github.com/goccy/go-json"
 
-	"github.com/icehugh/thinroute/internal/conversationstore"
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/conversationstore"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // Gateway-managed conversations live in the local conversation store; upstream

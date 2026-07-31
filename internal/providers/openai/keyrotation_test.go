@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/icehugh/thinroute/config"
-	"github.com/icehugh/thinroute/internal/providers"
+	"github.com/0xfig-labs/thinroute/config"
+	"github.com/0xfig-labs/thinroute/internal/providers"
 )
 
 // recordAuthServer serves /models and records the Authorization header of every

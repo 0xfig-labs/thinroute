@@ -1,6 +1,6 @@
 package usage
 
-import "github.com/icehugh/thinroute/internal/core"
+import "github.com/0xfig-labs/thinroute/internal/core"
 
 // ApplyRewriteSavings folds a request-rewrite savings estimate into a usage
 // entry: RewriteTokensSaved always, and RewriteCostSaved when pricing allows

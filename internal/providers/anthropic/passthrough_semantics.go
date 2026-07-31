@@ -1,6 +1,6 @@
 package anthropic
 
-import "github.com/icehugh/thinroute/internal/providers"
+import "github.com/0xfig-labs/thinroute/internal/providers"
 
 var passthroughSemanticEnricher = providers.NewSemanticEnricher("anthropic", map[string]providers.PassthroughEndpointSemantics{
 	"/messages":         {Operation: "anthropic.messages", AuditPath: "/v1/messages"},

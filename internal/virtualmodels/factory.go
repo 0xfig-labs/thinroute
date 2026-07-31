@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/icehugh/thinroute/config"
+	"github.com/0xfig-labs/thinroute/config"
 )
 
 // Result owns the immutable, configuration-backed virtual-model service.

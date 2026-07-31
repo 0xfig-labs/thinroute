@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // mockModelLookup implements core.ModelLookup for fast, isolated Router testing.

@@ -3,7 +3,7 @@ package providers
 import (
 	"net/http"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // AuthHeaderConfig describes how a provider populates outbound request headers.

@@ -11,22 +11,22 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/icehugh/thinroute/config"
-	"github.com/icehugh/thinroute/ext"
-	"github.com/icehugh/thinroute/internal/auditlog"
-	"github.com/icehugh/thinroute/internal/batch"
-	"github.com/icehugh/thinroute/internal/control"
-	"github.com/icehugh/thinroute/internal/conversationstore"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/filestore"
-	"github.com/icehugh/thinroute/internal/httpclient"
-	"github.com/icehugh/thinroute/internal/providers"
-	"github.com/icehugh/thinroute/internal/responsecache"
-	"github.com/icehugh/thinroute/internal/responsestore"
-	"github.com/icehugh/thinroute/internal/server"
-	"github.com/icehugh/thinroute/internal/storage"
-	"github.com/icehugh/thinroute/internal/usage"
-	"github.com/icehugh/thinroute/internal/virtualmodels"
+	"github.com/0xfig-labs/thinroute/config"
+	"github.com/0xfig-labs/thinroute/ext"
+	"github.com/0xfig-labs/thinroute/internal/auditlog"
+	"github.com/0xfig-labs/thinroute/internal/batch"
+	"github.com/0xfig-labs/thinroute/internal/control"
+	"github.com/0xfig-labs/thinroute/internal/conversationstore"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/filestore"
+	"github.com/0xfig-labs/thinroute/internal/httpclient"
+	"github.com/0xfig-labs/thinroute/internal/providers"
+	"github.com/0xfig-labs/thinroute/internal/responsecache"
+	"github.com/0xfig-labs/thinroute/internal/responsestore"
+	"github.com/0xfig-labs/thinroute/internal/server"
+	"github.com/0xfig-labs/thinroute/internal/storage"
+	"github.com/0xfig-labs/thinroute/internal/usage"
+	"github.com/0xfig-labs/thinroute/internal/virtualmodels"
 )
 
 // App represents the main application with all its dependencies.
@@ -42,7 +42,6 @@ type App struct {
 	conversations *conversationstore.Result
 	virtualModels *virtualmodels.Result
 	server        *server.Server
-	control       *server.ControlServer
 
 	shutdownMu  sync.Mutex
 	shutdown    bool
@@ -316,24 +315,6 @@ func New(ctx context.Context, cfg Config) (*App, error) {
 		serverCfg.StorageProbe = hc
 	}
 
-	// Initialize the local control API on its own listener.
-	controlCfg := appCfg.Control
-	usageEnabledForControl := usageResult.Logger.Config().Enabled
-
-	controlHandler, controlErr := initControl(
-		usageReader,
-		providerResult.Registry,
-		providerResult.ConfiguredProviders,
-		vm,
-		app,
-		controlRuntimeConfig(appCfg, usageEnabledForControl),
-	)
-	if controlErr != nil {
-		return fail("failed to initialize control API", controlErr)
-	}
-	app.control = server.NewControlServer(controlHandler, "")
-	slog.Info("control API enabled", "listen", controlCfg.Listen, "path", "/control/v1")
-
 	if appCfg.Server.PprofEnabled {
 		slog.Info("pprof enabled", "path", config.JoinBasePath(appCfg.Server.BasePath, "/debug/pprof/"))
 	}
@@ -425,21 +406,9 @@ func (a *App) startServer(ctx context.Context, address string, start func(contex
 		return fmt.Errorf("server is not initialized")
 	}
 
-	var controlListener net.Listener
-	var err error
-	if a.control != nil {
-		controlListener, err = net.Listen("tcp", a.config.Control.Listen)
-		if err != nil {
-			return fmt.Errorf("control server listen %s: %w", a.config.Control.Listen, err)
-		}
-	}
-
 	a.serverMu.Lock()
 	if a.serverDone != nil {
 		a.serverMu.Unlock()
-		if controlListener != nil {
-			_ = controlListener.Close()
-		}
 		return fmt.Errorf("server is already running")
 	}
 	serverCtx, cancel := context.WithCancel(ctx)
@@ -448,17 +417,8 @@ func (a *App) startServer(ctx context.Context, address string, start func(contex
 	a.serverDone = done
 	a.serverMu.Unlock()
 
-	if a.control != nil {
-		go func() {
-			if err := a.control.StartWithListener(serverCtx, controlListener); err != nil &&
-				!errors.Is(err, http.ErrServerClosed) && serverCtx.Err() == nil {
-				slog.Error("control server failed", "error", err)
-				cancel()
-			}
-		}()
-	}
 	slog.Info("starting server", "address", address)
-	err = start(serverCtx)
+	err := start(serverCtx)
 
 	a.serverMu.Lock()
 	if a.serverDone == done {

@@ -6,7 +6,6 @@ type LogConfig struct {
 	// Default: false
 	Enabled bool `yaml:"enabled" env:"LOGGING_ENABLED"`
 
-
 	// BufferSize is the number of log entries to buffer before flushing
 	// Default: 1000
 	BufferSize int `yaml:"buffer_size" env:"LOGGING_BUFFER_SIZE"`

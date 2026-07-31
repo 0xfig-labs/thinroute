@@ -11,9 +11,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/icehugh/thinroute/config"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/modeldata"
+	"github.com/0xfig-labs/thinroute/config"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/modeldata"
 )
 
 // Initialize fetches models from all registered providers and populates the registry.

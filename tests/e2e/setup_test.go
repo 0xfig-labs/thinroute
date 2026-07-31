@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/require"
 	_ "modernc.org/sqlite"
 
-	"github.com/icehugh/thinroute/internal/providers"
-	"github.com/icehugh/thinroute/internal/server"
-	"github.com/icehugh/thinroute/internal/usage"
+	"github.com/0xfig-labs/thinroute/internal/providers"
+	"github.com/0xfig-labs/thinroute/internal/server"
+	"github.com/0xfig-labs/thinroute/internal/usage"
 )
 
 type e2eServerOptions struct {

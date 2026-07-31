@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // realtimePath is the fixed GLM-Realtime websocket path. It is the same across

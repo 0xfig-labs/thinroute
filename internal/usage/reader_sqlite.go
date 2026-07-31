@@ -1,7 +1,7 @@
 package usage
 
 import (
-	"github.com/icehugh/thinroute/internal/storage/sqlutil"
+	"github.com/0xfig-labs/thinroute/internal/storage/sqlutil"
 
 	"context"
 	"database/sql"

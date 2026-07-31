@@ -11,10 +11,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/providers"
-	"github.com/icehugh/thinroute/internal/providers/compatible"
-	"github.com/icehugh/thinroute/internal/server"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/providers"
+	"github.com/0xfig-labs/thinroute/internal/providers/compatible"
+	"github.com/0xfig-labs/thinroute/internal/server"
 )
 
 // sampleChatResponseJSON is the JSON the mock backend returns for a chat

@@ -21,9 +21,9 @@ builds:
     main: ./cmd/thinroute
     ldflags:
       - -s -w
-      - -X github.com/icehugh/thinroute/internal/version.Version={{.Version}}
-      - -X github.com/icehugh/thinroute/internal/version.Commit={{.Commit}}
-      - -X github.com/icehugh/thinroute/internal/version.Date={{.Date}}
+      - -X github.com/0xfig-labs/thinroute/internal/version.Version={{.Version}}
+      - -X github.com/0xfig-labs/thinroute/internal/version.Commit={{.Commit}}
+      - -X github.com/0xfig-labs/thinroute/internal/version.Date={{.Date}}
 archives:
   - ids: [thinroute]
     formats: ['tar.gz']

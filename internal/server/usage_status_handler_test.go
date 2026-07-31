@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/icehugh/thinroute/internal/usage"
+	"github.com/0xfig-labs/thinroute/internal/usage"
 )
 
 type fakeUsageSummarizer struct {
@@ -78,8 +78,6 @@ func TestUsageStatusDerivedFields(t *testing.T) {
 		t.Fatalf("rate_limits = %v, want empty array", body.RateLimits)
 	}
 }
-
-
 
 func TestUsageStatusWithoutDependenciesReturnsEmptyStatus(t *testing.T) {
 	rec, body := getUsageStatus(t, &Config{}, "/v1/usage", map[string]string{

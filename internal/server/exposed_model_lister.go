@@ -3,7 +3,7 @@ package server
 import (
 	"sort"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // ExposedModelLister surfaces additional public models to include in GET /v1/models.

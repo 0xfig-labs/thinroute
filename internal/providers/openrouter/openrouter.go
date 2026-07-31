@@ -5,10 +5,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/llmclient"
-	"github.com/icehugh/thinroute/internal/providers"
-	"github.com/icehugh/thinroute/internal/providers/openai"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/llmclient"
+	"github.com/0xfig-labs/thinroute/internal/providers"
+	"github.com/0xfig-labs/thinroute/internal/providers/openai"
 )
 
 const (

@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/responsestore"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/responsestore"
 )
 
 func TestResponsesUtilityRoutesRejectNullBody(t *testing.T) {

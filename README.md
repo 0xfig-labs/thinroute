@@ -7,9 +7,9 @@ thinroute is a local-first, OpenAI-compatible LLM gateway: a single entry point 
 Requires Go 1.26 or later.
 
 ```bash
-git clone https://github.com/icehugh/thinroute.git
+git clone https://github.com/0xfig-labs/thinroute.git
 cd thinroute
-cp config/config.example.yaml config.yaml
+cp config.example.yaml config.yaml
 # Set provider credentials via environment variables, e.g.:
 #   export OPENAI_API_KEY=sk-...
 #   export ANTHROPIC_API_KEY=sk-ant-...
@@ -26,25 +26,23 @@ make build
 
 ## Configuration
 
-- Example: [`config/config.example.yaml`](config/config.example.yaml)
+- Example: [`config.example.yaml`](config.example.yaml)
 - Validate: `thinroute config validate`
 - Provider credentials are set via system environment variables, referenced in `config.yaml` as `${VAR}`. Credentials never live in the config file.
 
 Do not commit `config.yaml`, API keys, database files, or build artifacts.
 
-## CLI
-
 ```bash
-thinroute providers status     # Provider health table (colored when TTY)
-thinroute providers test <name> # Test a provider's connectivity
-thinroute usage                 # Today's requests, tokens, cost, top models
-thinroute usage --days 7        # Last 7 days
-thinroute usage --watch 2s      # Live-updating display
-thinroute usage --json          # Machine-readable output
-thinroute models list           # All available models
-thinroute models list --verbose # With pricing info
-thinroute config validate       # Validate config.yaml
+thinroute config validate
+thinroute usage [--days 7] [--json]
+thinroute providers status
+thinroute models list [--json]
+thinroute virtual-models list
+thinroute providers benchmark --model gpt-4o-mini --runs 3
 ```
+
+CLI commands initialize local provider and storage state directly; they do not
+connect to a running gateway process.
 
 ## Supported OpenAI-Compatible Endpoints
 

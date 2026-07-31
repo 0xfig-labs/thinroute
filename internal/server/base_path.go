@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/icehugh/thinroute/config"
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/config"
+	"github.com/0xfig-labs/thinroute/internal/core"
 
 	"github.com/labstack/echo/v5"
 )

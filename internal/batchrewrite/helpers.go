@@ -6,7 +6,7 @@ import (
 	"maps"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 const defaultCleanupLogMessage = "failed to delete rewritten batch input file"

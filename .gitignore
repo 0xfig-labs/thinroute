@@ -3,8 +3,8 @@
 /recordapi
 /bin
 
-# User config (created from config/config.example.yaml)
-/config/config.yaml
+# User config (created from config.example.yaml)
+/config.yaml
 
 # Cache
 /.cache

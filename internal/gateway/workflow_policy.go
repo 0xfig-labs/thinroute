@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // ApplyWorkflowPolicy applies the first matching workflow policy to workflow.

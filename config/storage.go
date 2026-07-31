@@ -1,6 +1,6 @@
 package config
 
-import "github.com/icehugh/thinroute/internal/storage"
+import "github.com/0xfig-labs/thinroute/internal/storage"
 
 // StorageConfig holds database storage configuration (used by audit logging, usage tracking, future IAM, etc.)
 type StorageConfig struct {

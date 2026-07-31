@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/batchrewrite"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/gateway"
+	"github.com/0xfig-labs/thinroute/internal/batchrewrite"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/gateway"
 )
 
 // BatchRequestPreparer rewrites a native batch request before provider

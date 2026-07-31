@@ -1,6 +1,6 @@
 package providers
 
-import "github.com/icehugh/thinroute/internal/core"
+import "github.com/0xfig-labs/thinroute/internal/core"
 
 func metadataPricing(metadata *core.ModelMetadata) *core.ModelPricing {
 	if metadata == nil {

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // PassthroughEndpoint normalizes a provider-relative passthrough endpoint into

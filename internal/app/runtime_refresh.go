@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/icehugh/thinroute/internal/control"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/providers"
+	"github.com/0xfig-labs/thinroute/internal/control"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/providers"
 )
 
 type refreshableService interface {

@@ -4,7 +4,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // Balancer selects one target from a list of viable targets. Each strategy
@@ -85,7 +85,7 @@ func (s *Service) balancedResolution(entry redirectEntry) (core.ModelSelector, b
 		return viable[0].selector, true
 	}
 
-	switch normalizeStrategy(entry.strategy) {
+	switch autoStrategy(entry.strategy) {
 	case StrategyCost:
 		return s.cheapestTarget(viable).selector, true
 	case StrategyWeighted:

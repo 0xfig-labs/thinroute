@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/icehugh/thinroute/internal/auditlog"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/virtualmodels"
+	"github.com/0xfig-labs/thinroute/internal/auditlog"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/virtualmodels"
 )
 
 type explodingValidationReadCloser struct{}

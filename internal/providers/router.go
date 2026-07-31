@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // ErrRegistryNotInitialized is returned when the router is used before the registry has any models.

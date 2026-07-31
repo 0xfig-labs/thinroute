@@ -8,8 +8,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/icehugh/thinroute/config"
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/config"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // ProviderConfig holds the fully resolved provider configuration after merging

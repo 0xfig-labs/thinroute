@@ -7,9 +7,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/filestore"
-	"github.com/icehugh/thinroute/internal/gateway"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/filestore"
+	"github.com/0xfig-labs/thinroute/internal/gateway"
 )
 
 type batchInputFileProviderResolver struct {

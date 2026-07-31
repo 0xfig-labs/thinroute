@@ -3,7 +3,7 @@ package anthropicapi
 import (
 	"net/http"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // ErrorFromGateway converts a gateway error into an HTTP status code and the

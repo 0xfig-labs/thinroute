@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/icehugh/thinroute/internal/providers"
+	"github.com/0xfig-labs/thinroute/internal/providers"
 )
 
 // HealthAwareBalancer weights targets by circuit breaker state, recency of

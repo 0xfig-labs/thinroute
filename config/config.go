@@ -14,7 +14,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/icehugh/thinroute/internal/storage"
+	"github.com/0xfig-labs/thinroute/internal/storage"
 )
 
 // Config holds the application configuration.
@@ -73,7 +73,7 @@ func buildDefaultConfig() *Config {
 				RefreshInterval: 3600,
 				RecheckInterval: 60,
 				ModelList: ModelListConfig{
-					URL: "https://raw.githubusercontent.com/ENTERPILOT/ai-model-list/refs/heads/main/models.min.json",
+					URL: "",
 				},
 				Local: nil,
 			},

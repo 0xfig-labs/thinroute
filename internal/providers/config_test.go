@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/icehugh/thinroute/config"
+	"github.com/0xfig-labs/thinroute/config"
 )
 
 var globalRetry = config.RetryConfig{

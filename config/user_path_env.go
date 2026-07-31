@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // applyKeyedLimitEnv merges <prefix>* env entries into keyed config entries.

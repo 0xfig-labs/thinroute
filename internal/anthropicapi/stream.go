@@ -7,7 +7,7 @@ import (
 
 	"github.com/goccy/go-json"
 
-	"github.com/icehugh/thinroute/internal/streaming"
+	"github.com/0xfig-labs/thinroute/internal/streaming"
 )
 
 // chatChunk is the subset of an OpenAI chat.completion.chunk consumed by the

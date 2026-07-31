@@ -3,7 +3,7 @@ package openai
 import (
 	"context"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // BatchSurface is an embeddable facet exposing CompatibleProvider's native

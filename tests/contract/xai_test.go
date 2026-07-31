@@ -10,9 +10,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/llmclient"
-	"github.com/icehugh/thinroute/internal/providers/xai"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/llmclient"
+	"github.com/0xfig-labs/thinroute/internal/providers/xai"
 )
 
 func newXAIReplayProvider(t *testing.T, routes map[string]replayRoute) core.Provider {

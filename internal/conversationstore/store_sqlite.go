@@ -11,7 +11,7 @@ import (
 
 	"github.com/goccy/go-json"
 
-	"github.com/icehugh/thinroute/internal/storage"
+	"github.com/0xfig-labs/thinroute/internal/storage"
 )
 
 // SQLiteStore persists conversation snapshots in SQLite.

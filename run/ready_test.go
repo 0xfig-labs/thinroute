@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/icehugh/thinroute/config"
+	"github.com/0xfig-labs/thinroute/config"
 )
 
 func TestReadyProbeURL(t *testing.T) {

@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/usage"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/usage"
 )
 
 // LogUsage writes one non-streaming usage entry when usage is enabled.

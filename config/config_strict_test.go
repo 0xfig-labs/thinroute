@@ -221,7 +221,7 @@ func TestLoad_ConfigStrictRejectsNonBoolean(t *testing.T) {
 func TestApplyYAML_ExampleConfigParses(t *testing.T) {
 	clearAllConfigEnvVars(t)
 
-	example, err := os.ReadFile("config.example.yaml")
+	example, err := os.ReadFile("../config.example.yaml")
 	if err != nil {
 		t.Fatalf("Failed to read config.example.yaml: %v", err)
 	}
@@ -245,7 +245,7 @@ func TestApplyYAML_UnreadableConfigFileIsAnError(t *testing.T) {
 			t.Fatalf("Failed to create directory: %v", err)
 		}
 
-	_, err := applyYAML(buildDefaultConfig(), "", true)
+		_, err := applyYAML(buildDefaultConfig(), "", true)
 		if err == nil {
 			t.Fatal("applyYAML() succeeded, want read error")
 		}

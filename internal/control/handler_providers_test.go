@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/icehugh/thinroute/internal/providers"
+	"github.com/0xfig-labs/thinroute/internal/providers"
 )
 
 // TestClassifyProviderStatus_HealthyForAllowlistInventory locks in the

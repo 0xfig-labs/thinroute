@@ -10,12 +10,12 @@ import (
 
 	"github.com/labstack/echo/v5"
 
-	"github.com/icehugh/thinroute/config"
-	"github.com/icehugh/thinroute/ext"
-	"github.com/icehugh/thinroute/internal/control"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/providers"
-	"github.com/icehugh/thinroute/internal/server"
+	"github.com/0xfig-labs/thinroute/config"
+	"github.com/0xfig-labs/thinroute/ext"
+	"github.com/0xfig-labs/thinroute/internal/control"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/providers"
+	"github.com/0xfig-labs/thinroute/internal/server"
 )
 
 type runtimeRefreshMockProvider struct {

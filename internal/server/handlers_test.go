@@ -25,16 +25,16 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/icehugh/thinroute/internal/auditlog"
-	batchstore "github.com/icehugh/thinroute/internal/batch"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/filestore"
-	"github.com/icehugh/thinroute/internal/gateway"
-	"github.com/icehugh/thinroute/internal/observability"
-	provideradapter "github.com/icehugh/thinroute/internal/providers"
-	"github.com/icehugh/thinroute/internal/responsestore"
-	"github.com/icehugh/thinroute/internal/usage"
-	"github.com/icehugh/thinroute/internal/virtualmodels"
+	"github.com/0xfig-labs/thinroute/internal/auditlog"
+	batchstore "github.com/0xfig-labs/thinroute/internal/batch"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/filestore"
+	"github.com/0xfig-labs/thinroute/internal/gateway"
+	"github.com/0xfig-labs/thinroute/internal/observability"
+	provideradapter "github.com/0xfig-labs/thinroute/internal/providers"
+	"github.com/0xfig-labs/thinroute/internal/responsestore"
+	"github.com/0xfig-labs/thinroute/internal/usage"
+	"github.com/0xfig-labs/thinroute/internal/virtualmodels"
 )
 
 func withRequestSnapshotAndPrompt(req *http.Request, frame *core.RequestSnapshot) *http.Request {

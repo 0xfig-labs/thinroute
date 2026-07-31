@@ -4,7 +4,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 func TestCalculateGranularCost_NilPricing(t *testing.T) {

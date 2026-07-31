@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // ChatExecutor applies virtual-model redirects to transport-free chat

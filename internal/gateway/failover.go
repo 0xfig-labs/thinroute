@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // FailoverSelectors returns failover selectors for a translated workflow.

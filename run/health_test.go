@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/icehugh/thinroute/config"
+	"github.com/0xfig-labs/thinroute/config"
 )
 
 func TestHealthProbeURL(t *testing.T) {

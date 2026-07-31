@@ -5,9 +5,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/modelselectors"
-	"github.com/icehugh/thinroute/internal/validation"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/modelselectors"
+	"github.com/0xfig-labs/thinroute/internal/validation"
 )
 
 // IsValidationError reports whether err is a validation error.
@@ -32,7 +32,7 @@ func normalizeRedirect(vm VirtualModel) (VirtualModel, []core.ModelSelector, err
 	}
 	if !validStrategy(vm.Strategy) {
 		return VirtualModel{}, nil, newValidationError(
-			fmt.Sprintf("unknown load-balancing strategy %q (use %q, %q, %q, %q, %q, or %q)", vm.Strategy, StrategyRoundRobin, StrategyCost, StrategyWeighted, StrategyRandom, StrategyLeastUsed, StrategyHealthAware), nil)
+			fmt.Sprintf("unknown load-balancing strategy %q", vm.Strategy), nil)
 	}
 	if len(vm.Targets) == 0 {
 		return VirtualModel{}, nil, newValidationError("at least one target is required", nil)

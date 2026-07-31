@@ -21,9 +21,9 @@ import (
 
 	"github.com/goccy/go-json"
 
-	"github.com/icehugh/thinroute/config"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/httpclient"
+	"github.com/0xfig-labs/thinroute/config"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/httpclient"
 )
 
 // RequestInfo contains metadata about a request for observability hooks

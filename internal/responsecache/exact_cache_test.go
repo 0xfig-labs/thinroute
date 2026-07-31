@@ -13,8 +13,8 @@ import (
 
 	"github.com/labstack/echo/v5"
 
-	"github.com/icehugh/thinroute/internal/cache"
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/cache"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 var benchmarkStreamingBody = []byte(`{"model":"gpt-4","stream":true,"messages":[{"role":"user","content":"hi"}]}`)

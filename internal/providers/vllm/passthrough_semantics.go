@@ -1,6 +1,6 @@
 package vllm
 
-import "github.com/icehugh/thinroute/internal/providers"
+import "github.com/0xfig-labs/thinroute/internal/providers"
 
 var passthroughSemanticEnricher = providers.NewSemanticEnricher("vllm", map[string]providers.PassthroughEndpointSemantics{
 	"/chat/completions": {Operation: "vllm.chat_completions", AuditPath: "/v1/chat/completions"},

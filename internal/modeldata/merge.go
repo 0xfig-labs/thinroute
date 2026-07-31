@@ -1,7 +1,7 @@
 package modeldata
 
 import (
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // MergeMetadata merges override onto base field-wise. Non-zero override fields

@@ -8,16 +8,16 @@ import (
 
 	"github.com/labstack/echo/v5"
 
-	"github.com/icehugh/thinroute/internal/auditlog"
-	batchstore "github.com/icehugh/thinroute/internal/batch"
-	"github.com/icehugh/thinroute/internal/conversationstore"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/filestore"
-	"github.com/icehugh/thinroute/internal/httpclient"
-	"github.com/icehugh/thinroute/internal/realtime"
-	"github.com/icehugh/thinroute/internal/responsecache"
-	"github.com/icehugh/thinroute/internal/responsestore"
-	"github.com/icehugh/thinroute/internal/usage"
+	"github.com/0xfig-labs/thinroute/internal/auditlog"
+	batchstore "github.com/0xfig-labs/thinroute/internal/batch"
+	"github.com/0xfig-labs/thinroute/internal/conversationstore"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/filestore"
+	"github.com/0xfig-labs/thinroute/internal/httpclient"
+	"github.com/0xfig-labs/thinroute/internal/realtime"
+	"github.com/0xfig-labs/thinroute/internal/responsecache"
+	"github.com/0xfig-labs/thinroute/internal/responsestore"
+	"github.com/0xfig-labs/thinroute/internal/usage"
 )
 
 // Handler holds the HTTP handlers

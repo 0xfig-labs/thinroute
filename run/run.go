@@ -25,10 +25,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/icehugh/thinroute/config"
-	"github.com/icehugh/thinroute/ext"
-	"github.com/icehugh/thinroute/internal/app"
-	"github.com/icehugh/thinroute/internal/version"
+	"github.com/0xfig-labs/thinroute/config"
+	"github.com/0xfig-labs/thinroute/ext"
+	"github.com/0xfig-labs/thinroute/internal/app"
+	"github.com/0xfig-labs/thinroute/internal/version"
 )
 
 var shutdownTimeout = 30 * time.Second
@@ -37,7 +37,7 @@ var shutdownTimeout = 30 * time.Second
 // gateway on os.Args.
 type Options struct {
 	// ProductName names the binary in CLI usage output, the startup log line,
-	// and --version output. Default: "github.com/icehugh/thinroute".
+	// and --version output. Default: "github.com/0xfig-labs/thinroute".
 	ProductName string
 	// Extensions is the extension registry snapshotted at server
 	// construction. Default: ext.Default.
@@ -57,7 +57,7 @@ type Options struct {
 
 func (o Options) withDefaults() Options {
 	if o.ProductName == "" {
-		o.ProductName = "github.com/icehugh/thinroute"
+		o.ProductName = "github.com/0xfig-labs/thinroute"
 	}
 	if o.Extensions == nil {
 		o.Extensions = ext.Default

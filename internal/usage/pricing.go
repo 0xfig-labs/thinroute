@@ -1,6 +1,6 @@
 package usage
 
-import "github.com/icehugh/thinroute/internal/core"
+import "github.com/0xfig-labs/thinroute/internal/core"
 
 // PricingResolver resolves pricing metadata for a given model and provider type.
 // Implementations should check the registry first and fall back to a reverse-index

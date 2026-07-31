@@ -1,4 +1,4 @@
-module github.com/icehugh/thinroute
+module github.com/0xfig-labs/thinroute
 
 go 1.26.5
 

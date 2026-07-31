@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // MockLLMServer simulates an upstream LLM provider (like OpenAI).

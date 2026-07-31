@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/icehugh/thinroute/config"
-	"github.com/icehugh/thinroute/internal/storage"
+	"github.com/0xfig-labs/thinroute/config"
+	"github.com/0xfig-labs/thinroute/internal/storage"
 )
 
 // Result holds the initialized usage logger and its dependencies.

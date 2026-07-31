@@ -1,12 +1,12 @@
 package usage
 
 import (
-	"github.com/icehugh/thinroute/internal/storage/sqlutil"
+	"github.com/0xfig-labs/thinroute/internal/storage/sqlutil"
 
 	"fmt"
 	"regexp"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 func normalizeUsageUserPathFilter(raw string) (string, error) {

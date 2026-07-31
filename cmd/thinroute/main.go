@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/icehugh/thinroute/internal/command"
-	"github.com/icehugh/thinroute/run"
+	"github.com/0xfig-labs/thinroute/internal/command"
+	"github.com/0xfig-labs/thinroute/run"
 )
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 		args = args[1:]
 	}
 	err := run.Run(context.Background(), run.Options{
-		ProductName: "github.com/icehugh/thinroute",
+		ProductName: "github.com/0xfig-labs/thinroute",
 		Args:        args,
 	})
 	if code := run.ExitCode(err); code != 0 {
@@ -33,7 +33,12 @@ func main() {
 
 func isManagementCommand(args []string) bool {
 	commands := map[string]struct{}{
-		"providers": {}, "usage": {}, "models": {}, "config": {},
+		"config":         {},
+		"usage":          {},
+		"providers":      {},
+		"models":         {},
+		"virtual-models": {},
+		"doctor":         {},
 	}
 	for _, arg := range args {
 		if _, ok := commands[arg]; ok {

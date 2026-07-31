@@ -9,9 +9,9 @@ DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 LOG_LEVEL ?= debug
 
 # Linker flags to inject version info
-LDFLAGS := -X "github.com/icehugh/thinroute/internal/version.Version=$(VERSION)" \
-           -X "github.com/icehugh/thinroute/internal/version.Commit=$(COMMIT)" \
-           -X "github.com/icehugh/thinroute/internal/version.Date=$(DATE)"
+LDFLAGS := -X "github.com/0xfig-labs/thinroute/internal/version.Version=$(VERSION)" \
+           -X "github.com/0xfig-labs/thinroute/internal/version.Commit=$(COMMIT)" \
+           -X "github.com/0xfig-labs/thinroute/internal/version.Date=$(DATE)"
 
 install-tools:
 	@command -v golangci-lint > /dev/null 2>&1 || (echo "Installing golangci-lint..." && go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.10)

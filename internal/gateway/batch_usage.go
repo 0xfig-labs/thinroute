@@ -12,9 +12,9 @@ import (
 
 	"github.com/google/uuid"
 
-	batchstore "github.com/icehugh/thinroute/internal/batch"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/usage"
+	batchstore "github.com/0xfig-labs/thinroute/internal/batch"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/usage"
 )
 
 // LogBatchUsageFromBatchResults writes per-item usage from batch results once.

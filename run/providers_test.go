@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/icehugh/thinroute/config"
+	"github.com/0xfig-labs/thinroute/config"
 )
 
 func TestDefaultProviderFactoryRegistersAllProviderTypes(t *testing.T) {

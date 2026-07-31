@@ -323,7 +323,7 @@ server:
 func TestLoad_ConfigExample_UsesNestedModelCacheSettings(t *testing.T) {
 	clearAllConfigEnvVars(t)
 
-	examplePath, err := filepath.Abs("config.example.yaml")
+	examplePath, err := filepath.Abs("../config.example.yaml")
 	if err != nil {
 		t.Fatalf("Failed to resolve config.example.yaml path: %v", err)
 	}

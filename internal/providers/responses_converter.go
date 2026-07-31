@@ -12,7 +12,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/icehugh/thinroute/internal/streaming"
+	"github.com/0xfig-labs/thinroute/internal/streaming"
 )
 
 // OpenAIResponsesStreamConverter wraps an OpenAI-compatible SSE stream

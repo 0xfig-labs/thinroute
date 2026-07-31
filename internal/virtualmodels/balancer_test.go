@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 func floatPtr(v float64) *float64 { return &v }
@@ -354,6 +354,37 @@ func TestBalancer_CostSkipsSaturatedCheapestTarget(t *testing.T) {
 	for i, got := range resolvedModels(t, svc, "cheap", 3) {
 		if got != "openai/gpt-4o" {
 			t.Fatalf("resolution[%d] = %q, want cheapest target WITH capacity (openai/gpt-4o)", i, got)
+		}
+	}
+}
+func TestBalancer_AutoCheapUsesCostStrategy(t *testing.T) {
+	t.Parallel()
+	svc := newBalancingService(t)
+	if err := svc.Upsert(context.Background(), VirtualModel{
+		Source:   "auto/cheap",
+		Strategy: StrategyAutoCheap,
+		Targets: []Target{
+			{Provider: "openai", Model: "gpt-4o"},
+			{Provider: "groq", Model: "llama"},
+		},
+		Enabled: true,
+	}); err != nil {
+		t.Fatalf("Upsert() error = %v", err)
+	}
+	if got := resolvedModels(t, svc, "auto/cheap", 1)[0]; got != "groq/llama" {
+		t.Fatalf("auto/cheap chose %q, want groq/llama", got)
+	}
+}
+func TestAutoStrategiesMapToExistingBalancers(t *testing.T) {
+	t.Parallel()
+	tests := map[string]string{
+		StrategyAuto:      StrategyHealthAware,
+		StrategyAutoFast:  StrategyLeastUsed,
+		StrategyAutoCheap: StrategyCost,
+	}
+	for input, want := range tests {
+		if got := autoStrategy(input); got != want {
+			t.Errorf("autoStrategy(%q) = %q, want %q", input, got, want)
 		}
 	}
 }

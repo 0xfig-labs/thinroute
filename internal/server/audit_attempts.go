@@ -5,8 +5,8 @@ import (
 
 	"github.com/labstack/echo/v5"
 
-	"github.com/icehugh/thinroute/internal/auditlog"
-	"github.com/icehugh/thinroute/internal/gateway"
+	"github.com/0xfig-labs/thinroute/internal/auditlog"
+	"github.com/0xfig-labs/thinroute/internal/gateway"
 )
 
 func enrichAuditEntryWithProviderAttempts(c *echo.Context) {

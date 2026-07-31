@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	batchstore "github.com/icehugh/thinroute/internal/batch"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/usage"
+	batchstore "github.com/0xfig-labs/thinroute/internal/batch"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/usage"
 )
 
 func TestMergeStoredBatchFromUpstreamPreservesGatewayOwnedMetadata(t *testing.T) {

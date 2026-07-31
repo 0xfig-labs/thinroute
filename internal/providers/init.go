@@ -9,10 +9,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/icehugh/thinroute/config"
-	"github.com/icehugh/thinroute/internal/cache/modelcache"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/modeldata"
+	"github.com/0xfig-labs/thinroute/config"
+	"github.com/0xfig-labs/thinroute/internal/cache/modelcache"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/modeldata"
 )
 
 // InitResult holds the initialized provider infrastructure and cleanup functions.

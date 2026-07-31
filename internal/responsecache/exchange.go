@@ -9,7 +9,7 @@ import (
 
 	"github.com/labstack/echo/v5"
 
-	"github.com/icehugh/thinroute/internal/auditlog"
+	"github.com/0xfig-labs/thinroute/internal/auditlog"
 )
 
 // exchange abstracts the transport for one cache-mediated request so the

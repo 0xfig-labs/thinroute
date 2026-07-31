@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	batchstore "github.com/icehugh/thinroute/internal/batch"
-	"github.com/icehugh/thinroute/internal/core"
+	batchstore "github.com/0xfig-labs/thinroute/internal/batch"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 var batchResultsPending404Providers = map[string]struct{}{

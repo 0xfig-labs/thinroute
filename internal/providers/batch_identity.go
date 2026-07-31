@@ -1,6 +1,6 @@
 package providers
 
-import "github.com/icehugh/thinroute/internal/core"
+import "github.com/0xfig-labs/thinroute/internal/core"
 
 // EnsureProviderBatchID defaults the provider-facing batch ID to the response ID
 // when an OpenAI-compatible upstream does not return a distinct one. No-op for a

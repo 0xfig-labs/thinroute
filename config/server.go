@@ -20,10 +20,10 @@ var bodySizeLimitRegex = regexp.MustCompile(`(?i)^(\d+)([KMG])?B?$`)
 
 // ServerConfig holds HTTP server configuration
 type ServerConfig struct {
-	Listen         string `yaml:"listen"`                                  // Address to listen on (default: 127.0.0.1:52180)
-	BasePath       string `yaml:"base_path" env:"BASE_PATH"`             // URL path prefix where the app is mounted (e.g., "/g")
-	BodySizeLimit  string `yaml:"body_size_limit" env:"BODY_SIZE_LIMIT"` // Max request body size (e.g., "10M", "1024K")
-	PprofEnabled   bool   `yaml:"pprof_enabled" env:"PPROF_ENABLED"`     // Whether to expose debug profiling routes at /debug/pprof/*
+	Listen        string `yaml:"listen"`                                // Address to listen on (default: 127.0.0.1:52180)
+	BasePath      string `yaml:"base_path" env:"BASE_PATH"`             // URL path prefix where the app is mounted (e.g., "/g")
+	BodySizeLimit string `yaml:"body_size_limit" env:"BODY_SIZE_LIMIT"` // Max request body size (e.g., "10M", "1024K")
+	PprofEnabled  bool   `yaml:"pprof_enabled" env:"PPROF_ENABLED"`     // Whether to expose debug profiling routes at /debug/pprof/*
 	// EnablePassthroughRoutes exposes provider-native passthrough endpoints under
 	// /p/{provider}/{endpoint}. Default: true.
 	EnablePassthroughRoutes bool `yaml:"enable_passthrough_routes" env:"ENABLE_PASSTHROUGH_ROUTES"`

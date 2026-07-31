@@ -5,8 +5,7 @@ import (
 	"strings"
 	"time"
 
-
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 const (
@@ -56,7 +55,7 @@ type LogEntry struct {
 
 // LogData contains lightweight request/response metadata.
 type LogData struct {
-	UserAgent  string  `json:"user_agent,omitempty" bson:"user_agent,omitempty"`
+	UserAgent   string   `json:"user_agent,omitempty" bson:"user_agent,omitempty"`
 	Temperature *float64 `json:"temperature,omitempty" bson:"temperature,omitempty"`
 	MaxTokens   *int     `json:"max_tokens,omitempty" bson:"max_tokens,omitempty"`
 
@@ -126,8 +125,6 @@ func RedactHeaders(headers map[string]string) map[string]string {
 	}
 	return result
 }
-
-
 
 // normalizeAttemptSnapshots normalizes and filters attempt snapshots.
 func normalizeAttemptSnapshots(attempts []AttemptSnapshot) []AttemptSnapshot {

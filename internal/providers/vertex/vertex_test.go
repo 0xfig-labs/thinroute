@@ -17,9 +17,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/providers"
-	"github.com/icehugh/thinroute/internal/providers/googlecommon"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/providers"
+	"github.com/0xfig-labs/thinroute/internal/providers/googlecommon"
 
 	"golang.org/x/oauth2"
 )

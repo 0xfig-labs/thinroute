@@ -1,7 +1,7 @@
 package modeldata
 
 import (
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // ModelInfoAccessor provides the minimal interface needed by Enrich to access

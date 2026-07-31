@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // Target is one concrete (provider, model) destination of a redirect.
@@ -81,7 +81,27 @@ const (
 	// StrategyHealthAware weighs targets by circuit-breaker state and recency of
 	// successful availability checks, excluding unhealthy targets.
 	StrategyHealthAware = "health_aware"
+	// StrategyAuto balances health and recent availability. It is the stable,
+	// general-purpose virtual model strategy.
+	StrategyAuto = "auto"
+	// StrategyAutoFast prefers the target with the fewest in-flight requests.
+	StrategyAutoFast = "auto/fast"
+	// StrategyAutoCheap prefers the target with the lowest configured price.
+	StrategyAutoCheap = "auto/cheap"
 )
+
+func autoStrategy(strategy string) string {
+	switch normalizeStrategy(strategy) {
+	case StrategyAuto:
+		return StrategyHealthAware
+	case StrategyAutoFast:
+		return StrategyLeastUsed
+	case StrategyAutoCheap:
+		return StrategyCost
+	default:
+		return normalizeStrategy(strategy)
+	}
+}
 
 // normalizeStrategy lower-cases and defaults a strategy string. An empty value
 // defaults to round robin so single-target aliases keep their prior behavior.
@@ -96,7 +116,7 @@ func normalizeStrategy(strategy string) string {
 // validStrategy reports whether strategy names a supported load-balancing mode.
 func validStrategy(strategy string) bool {
 	switch normalizeStrategy(strategy) {
-	case StrategyRoundRobin, StrategyCost, StrategyWeighted, StrategyRandom, StrategyLeastUsed, StrategyHealthAware:
+	case StrategyRoundRobin, StrategyCost, StrategyWeighted, StrategyRandom, StrategyLeastUsed, StrategyHealthAware, StrategyAuto, StrategyAutoFast, StrategyAutoCheap:
 		return true
 	default:
 		return false

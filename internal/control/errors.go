@@ -3,8 +3,8 @@ package control
 import (
 	"net/http"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/virtualmodels"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/virtualmodels"
 )
 
 func featureUnavailableError(message string) error {

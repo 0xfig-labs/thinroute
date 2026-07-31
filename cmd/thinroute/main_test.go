@@ -13,6 +13,7 @@ func TestIsManagementCommand(t *testing.T) {
 		{[]string{"usage"}, true},
 		{[]string{"models", "list"}, true},
 		{[]string{"config", "validate"}, true},
+		{[]string{"virtual-models", "list"}, true},
 	} {
 		if got := isManagementCommand(test.args); got != test.want {
 			t.Fatalf("isManagementCommand(%v) = %v, want %v", test.args, got, test.want)

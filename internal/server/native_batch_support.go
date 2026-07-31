@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	batchstore "github.com/icehugh/thinroute/internal/batch"
-	"github.com/icehugh/thinroute/internal/batchrewrite"
-	"github.com/icehugh/thinroute/internal/core"
+	batchstore "github.com/0xfig-labs/thinroute/internal/batch"
+	"github.com/0xfig-labs/thinroute/internal/batchrewrite"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 func (h *Handler) cleanupPreparedBatchInputFile(ctx context.Context, providerType, fileID string) {

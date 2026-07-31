@@ -3,7 +3,7 @@ package server
 import (
 	"sync"
 
-	"github.com/icehugh/thinroute/internal/usage"
+	"github.com/0xfig-labs/thinroute/internal/usage"
 )
 
 type usageCaptureLogger struct {

@@ -3,7 +3,7 @@ package gateway
 import (
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // CloneChatRequestForStreamUsage clones chat stream options before usage mutation.

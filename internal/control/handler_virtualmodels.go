@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo/v5"
 
-	"github.com/icehugh/thinroute/internal/virtualmodels"
+	"github.com/0xfig-labs/thinroute/internal/virtualmodels"
 )
 
 // ListVirtualModels returns the immutable virtual-model configuration together

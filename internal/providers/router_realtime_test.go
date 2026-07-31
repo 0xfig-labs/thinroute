@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // realtimeMockProvider is a mockProvider that also implements core.RealtimeProvider

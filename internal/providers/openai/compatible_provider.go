@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/llmclient"
-	"github.com/icehugh/thinroute/internal/providers"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/llmclient"
+	"github.com/0xfig-labs/thinroute/internal/providers"
 )
 
 type RequestMutator func(*llmclient.Request)

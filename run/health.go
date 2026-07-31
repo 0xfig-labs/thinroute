@@ -12,7 +12,7 @@ import (
 
 	"github.com/goccy/go-json"
 
-	"github.com/icehugh/thinroute/config"
+	"github.com/0xfig-labs/thinroute/config"
 )
 
 func runHealthProbe(timeout time.Duration) error {

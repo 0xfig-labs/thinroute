@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // RealtimeTarget implements core.RealtimeProvider for Azure OpenAI's GPT Realtime

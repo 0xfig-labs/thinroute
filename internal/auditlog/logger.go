@@ -75,8 +75,6 @@ func (l *Logger) Write(entry *LogEntry) {
 	}
 }
 
-
-
 // Config returns the logger configuration
 func (l *Logger) Config() Config {
 	return l.config

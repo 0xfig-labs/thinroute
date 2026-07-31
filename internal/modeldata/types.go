@@ -5,7 +5,7 @@ package modeldata
 import (
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // ModelList represents the top-level structure of models.json.

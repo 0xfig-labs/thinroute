@@ -11,21 +11,21 @@ import (
 	"strings"
 	"time"
 
-	"github.com/icehugh/thinroute/config"
-	"github.com/icehugh/thinroute/ext"
+	"github.com/0xfig-labs/thinroute/config"
+	"github.com/0xfig-labs/thinroute/ext"
 
 	"github.com/labstack/echo/v5"
 	"github.com/labstack/echo/v5/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/icehugh/thinroute/internal/auditlog"
-	batchstore "github.com/icehugh/thinroute/internal/batch"
-	"github.com/icehugh/thinroute/internal/conversationstore"
-	"github.com/icehugh/thinroute/internal/core"
-	"github.com/icehugh/thinroute/internal/filestore"
-	"github.com/icehugh/thinroute/internal/responsecache"
-	"github.com/icehugh/thinroute/internal/responsestore"
-	"github.com/icehugh/thinroute/internal/usage"
+	"github.com/0xfig-labs/thinroute/internal/auditlog"
+	batchstore "github.com/0xfig-labs/thinroute/internal/batch"
+	"github.com/0xfig-labs/thinroute/internal/conversationstore"
+	"github.com/0xfig-labs/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/filestore"
+	"github.com/0xfig-labs/thinroute/internal/responsecache"
+	"github.com/0xfig-labs/thinroute/internal/responsestore"
+	"github.com/0xfig-labs/thinroute/internal/usage"
 )
 
 // Server wraps the Echo server

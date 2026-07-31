@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"slices"
 
-	"github.com/icehugh/thinroute/internal/core"
+	"github.com/0xfig-labs/thinroute/internal/core"
 )
 
 // EnabledByDefault reports the process-wide model availability default.

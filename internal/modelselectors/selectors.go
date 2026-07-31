@@ -5,7 +5,7 @@ package modelselectors
 import (
 	"strings"
 
-	"github.com/icehugh/thinroute/internal/validation"
+	"github.com/0xfig-labs/thinroute/internal/validation"
 )
 
 // Catalog is the minimal configured-provider surface needed for selector validation.
