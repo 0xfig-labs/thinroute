@@ -1,0 +1,35 @@
+# Compiled binary
+/thinroute
+/recordapi
+/bin
+
+# User config (created from config/config.example.yaml)
+/config/config.yaml
+
+# Cache
+/.cache
+
+# Data (runtime-created by SQLite storage)
+*.db
+*.db-shm
+*.db-wal
+.DS_Store
+/data/
+
+# OpenCode config - ignore because it might contain private servers URLs
+/opencode.json
+
+# Local git worktrees
+/.worktrees/
+
+# Local pre-commit hook (not shared)
+/.githooks/
+
+# Others
+/*.bck.yml
+/repomix-output.*
+/coverage.out
+/.claude/
+
+# Superpower design docs and plans (never commit)
+/docs/superpowers/

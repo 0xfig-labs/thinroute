@@ -1,0 +1,25 @@
+package config
+
+// UsageConfig holds token usage tracking configuration
+type UsageConfig struct {
+	// Enabled controls whether usage tracking is active
+	// Default: true
+	Enabled bool `yaml:"enabled" env:"USAGE_ENABLED"`
+
+	// EnforceReturningUsageData controls whether to ask streaming providers to return usage data when possible.
+	// When true, stream_options: {"include_usage": true} is added for provider paths that support it.
+	// Default: true
+	EnforceReturningUsageData bool `yaml:"enforce_returning_usage_data" env:"ENFORCE_RETURNING_USAGE_DATA"`
+
+	// BufferSize is the number of usage entries to buffer before flushing
+	// Default: 1000
+	BufferSize int `yaml:"buffer_size" env:"USAGE_BUFFER_SIZE"`
+
+	// FlushInterval is how often to flush buffered usage entries (in seconds)
+	// Default: 5
+	FlushInterval int `yaml:"flush_interval" env:"USAGE_FLUSH_INTERVAL"`
+
+	// RetentionDays is how long to keep usage data (0 = forever)
+	// Default: 90
+	RetentionDays int `yaml:"retention_days" env:"USAGE_RETENTION_DAYS"`
+}

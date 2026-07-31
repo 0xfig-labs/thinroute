@@ -1,0 +1,46 @@
+package server
+
+import (
+	"context"
+
+	"github.com/labstack/echo/v5"
+
+	"github.com/icehugh/thinroute/internal/auditlog"
+	"github.com/icehugh/thinroute/internal/gateway"
+)
+
+func enrichAuditEntryWithProviderAttempts(c *echo.Context) {
+	if c == nil || c.Request() == nil {
+		return
+	}
+	attempts := auditAttemptsFromGateway(c.Request().Context())
+	if len(attempts) == 0 {
+		return
+	}
+	auditlog.EnrichEntryWithAttempts(c, attempts)
+}
+
+func auditAttemptsFromGateway(ctx context.Context) []auditlog.AttemptSnapshot {
+	gatewayAttempts := gateway.AttemptsFromContext(ctx)
+	if len(gatewayAttempts) == 0 {
+		return nil
+	}
+	attempts := make([]auditlog.AttemptSnapshot, 0, len(gatewayAttempts))
+	for _, attempt := range gatewayAttempts {
+		attempts = append(attempts, auditlog.AttemptSnapshot{
+			Seq:          attempt.Seq,
+			Kind:         attempt.Kind,
+			ProviderType: attempt.ProviderType,
+			ProviderName: attempt.ProviderName,
+			Model:        attempt.Model,
+			StatusCode:   attempt.StatusCode,
+			Success:      attempt.Success,
+			ErrorType:    attempt.ErrorType,
+			ErrorCode:    attempt.ErrorCode,
+			ErrorMessage: attempt.ErrorMessage,
+			StartedAt:    attempt.StartedAt,
+			DurationNs:   attempt.DurationNs,
+		})
+	}
+	return attempts
+}

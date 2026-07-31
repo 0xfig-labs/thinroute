@@ -1,0 +1,723 @@
+package server
+
+import (
+	"context"
+	"io"
+	"net"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/icehugh/thinroute/internal/core"
+
+	"github.com/labstack/echo/v5"
+)
+
+func TestRequestIDMiddleware(t *testing.T) {
+	mock := &mockProvider{}
+	srv := New(mock, nil)
+
+	t.Run("generates request ID when missing", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/health", nil)
+		rec := httptest.NewRecorder()
+
+		srv.ServeHTTP(rec, req)
+
+		got := rec.Header().Get("X-Request-ID")
+		if got == "" {
+			t.Fatal("expected X-Request-ID in response header, got empty")
+		}
+		// Validate UUID format (8-4-4-4-12 hex digits)
+		if len(got) != 36 {
+			t.Errorf("expected UUID (36 chars), got %q (%d chars)", got, len(got))
+		}
+	})
+
+	t.Run("preserves existing request ID", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/health", nil)
+		req.Header.Set("X-Request-ID", "my-custom-id")
+		rec := httptest.NewRecorder()
+
+		srv.ServeHTTP(rec, req)
+
+		// Request header must not be overwritten
+		got := req.Header.Get("X-Request-ID")
+		if got != "my-custom-id" {
+			t.Errorf("expected request header to be preserved as %q, got %q", "my-custom-id", got)
+		}
+
+		// Response header must echo the client-provided ID back
+		respID := rec.Header().Get("X-Request-ID")
+		if respID != "my-custom-id" {
+			t.Errorf("expected response header X-Request-ID to be %q, got %q", "my-custom-id", respID)
+		}
+	})
+}
+
+func TestServerUsesDirectIPExtractorByDefault(t *testing.T) {
+	mock := &mockProvider{}
+	srv := New(mock, nil)
+	srv.echo.GET("/debug/ip", func(c *echo.Context) error {
+		return c.String(http.StatusOK, c.RealIP())
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/debug/ip", nil)
+	req.RemoteAddr = "203.0.113.7:4321"
+	req.Header.Set("X-Forwarded-For", "198.51.100.8")
+	req.Header.Set("X-Real-IP", "198.51.100.9")
+	rec := httptest.NewRecorder()
+
+	srv.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	if got := rec.Body.String(); got != "203.0.113.7" {
+		t.Fatalf("RealIP = %q, want remote address host", got)
+	}
+}
+
+func TestServerAllowsTrustedProxyIPExtractorOverride(t *testing.T) {
+	mock := &mockProvider{}
+	srv := New(mock, &Config{
+		IPExtractor: echo.ExtractIPFromXFFHeader(),
+	})
+	srv.echo.GET("/debug/ip", func(c *echo.Context) error {
+		return c.String(http.StatusOK, c.RealIP())
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/debug/ip", nil)
+	req.RemoteAddr = "10.0.0.10:4321"
+	req.Header.Set("X-Forwarded-For", "198.51.100.8")
+	rec := httptest.NewRecorder()
+
+	srv.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	if got := rec.Body.String(); got != "198.51.100.8" {
+		t.Fatalf("RealIP = %q, want X-Forwarded-For client IP", got)
+	}
+}
+
+func TestStartWithListener(t *testing.T) {
+	mock := &mockProvider{}
+	srv := New(mock, nil)
+
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("net.Listen() error = %v", err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan error, 1)
+	go func() {
+		done <- srv.StartWithListener(ctx, listener)
+	}()
+
+	client := &http.Client{Timeout: 200 * time.Millisecond}
+	url := "http://" + listener.Addr().String() + "/health"
+	var lastErr error
+	for i := 0; i < 20; i++ {
+		resp, err := client.Get(url)
+		if err == nil {
+			_ = resp.Body.Close()
+			if resp.StatusCode == http.StatusOK {
+				cancel()
+				if err := <-done; err != nil {
+					t.Fatalf("StartWithListener() error = %v", err)
+				}
+				return
+			}
+			lastErr = nil
+		} else {
+			lastErr = err
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+
+	cancel()
+	if err := <-done; err != nil {
+		t.Fatalf("StartWithListener() error after timeout = %v", err)
+	}
+	t.Fatalf("health check never succeeded, last error: %v", lastErr)
+}
+
+func TestMetricsEndpoint(t *testing.T) {
+	tests := []struct {
+		name           string
+		config         *Config
+		requestPath    string
+		expectedStatus int
+		expectBody     string // substring to check in response body
+	}{
+		{
+			name: "metrics enabled - default endpoint accessible",
+			config: &Config{
+				MetricsEnabled:  true,
+				MetricsEndpoint: "/metrics",
+			},
+			requestPath:    "/metrics",
+			expectedStatus: http.StatusOK,
+			expectBody:     "go_goroutines", // Standard Go runtime metric
+		},
+		{
+			name: "metrics enabled - empty endpoint defaults to /metrics",
+			config: &Config{
+				MetricsEnabled:  true,
+				MetricsEndpoint: "",
+			},
+			requestPath:    "/metrics",
+			expectedStatus: http.StatusOK,
+			expectBody:     "go_goroutines",
+		},
+		{
+			name: "metrics disabled - endpoint returns 404",
+			config: &Config{
+				MetricsEnabled:  false,
+				MetricsEndpoint: "/metrics",
+			},
+			requestPath:    "/metrics",
+			expectedStatus: http.StatusNotFound,
+		},
+		{
+			name:           "nil config - metrics disabled by default",
+			config:         nil,
+			requestPath:    "/metrics",
+			expectedStatus: http.StatusNotFound,
+		},
+		{
+			name: "custom metrics endpoint path",
+			config: &Config{
+				MetricsEnabled:  true,
+				MetricsEndpoint: "/custom-metrics",
+			},
+			requestPath:    "/custom-metrics",
+			expectedStatus: http.StatusOK,
+			expectBody:     "go_goroutines",
+		},
+		{
+			name: "custom endpoint - default path returns 404",
+			config: &Config{
+				MetricsEnabled:  true,
+				MetricsEndpoint: "/custom-metrics",
+			},
+			requestPath:    "/metrics",
+			expectedStatus: http.StatusNotFound,
+		},
+		{
+			name: "metrics endpoint with nested path",
+			config: &Config{
+				MetricsEnabled:  true,
+				MetricsEndpoint: "/api/v1/metrics",
+			},
+			requestPath:    "/api/v1/metrics",
+			expectedStatus: http.StatusOK,
+			expectBody:     "go_goroutines",
+		},
+		{
+			name: "metrics endpoint conflicting with passthrough route falls back to default",
+			config: &Config{
+				MetricsEnabled:  true,
+				MetricsEndpoint: "/p/internal-metrics",
+			},
+			requestPath:    "/metrics",
+			expectedStatus: http.StatusOK,
+			expectBody:     "go_goroutines",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock := &mockProvider{}
+			srv := New(mock, tt.config)
+
+			req := httptest.NewRequest(http.MethodGet, tt.requestPath, nil)
+			rec := httptest.NewRecorder()
+
+			srv.ServeHTTP(rec, req)
+
+			if rec.Code != tt.expectedStatus {
+				t.Errorf("expected status %d, got %d", tt.expectedStatus, rec.Code)
+			}
+
+			if tt.expectBody != "" && !strings.Contains(rec.Body.String(), tt.expectBody) {
+				t.Errorf("expected body to contain %q, got: %s", tt.expectBody, rec.Body.String())
+			}
+		})
+	}
+}
+
+func TestBasePathStripsPrefixBeforeRouting(t *testing.T) {
+	mock := &mockProvider{
+		modelsResponse: &core.ModelsResponse{
+			Object: "list",
+			Data: []core.Model{
+				{ID: "llama3.2", Object: "model", OwnedBy: "ollama"},
+			},
+		},
+	}
+	srv := New(mock, &Config{
+		BasePath:        "g/",
+		MetricsEnabled:  true,
+		MetricsEndpoint: "/metrics",
+	})
+
+	tests := []struct {
+		name           string
+		method         string
+		path           string
+		expectedStatus int
+		expectBody     string
+	}{
+		{
+			name:           "prefixed health route",
+			method:         http.MethodGet,
+			path:           "/g/health",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "unprefixed health route is not exposed",
+			method:         http.MethodGet,
+			path:           "/health",
+			expectedStatus: http.StatusNotFound,
+		},
+		{
+			name:           "prefixed models route sees canonical internal path",
+			method:         http.MethodGet,
+			path:           "/g/v1/models",
+			expectedStatus: http.StatusOK,
+			expectBody:     "llama3.2",
+		},
+		{
+			name:           "prefixed metrics route",
+			method:         http.MethodGet,
+			path:           "/g/metrics",
+			expectedStatus: http.StatusOK,
+			expectBody:     "go_goroutines",
+		},
+		{
+			name:           "prefix overmatch is rejected",
+			method:         http.MethodGet,
+			path:           "/gopher/health",
+			expectedStatus: http.StatusNotFound,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(tt.method, tt.path, nil)
+			rec := httptest.NewRecorder()
+
+			srv.ServeHTTP(rec, req)
+
+			if rec.Code != tt.expectedStatus {
+				t.Fatalf("status = %d, want %d; body=%s", rec.Code, tt.expectedStatus, rec.Body.String())
+			}
+			if tt.expectBody != "" && !strings.Contains(rec.Body.String(), tt.expectBody) {
+				t.Fatalf("body = %q, want substring %q", rec.Body.String(), tt.expectBody)
+			}
+		})
+	}
+}
+
+func TestBasePathPreservesEscapedPathParamsBeforeRouting(t *testing.T) {
+	srv := New(&mockProvider{}, &Config{BasePath: "/g"})
+	srv.echo.PUT("/probe/:user_path/:period", func(c *echo.Context) error {
+		return c.String(
+			http.StatusOK,
+			c.Param("user_path")+"|"+c.Param("period")+"|"+c.Request().URL.RawPath+"|"+c.Request().RequestURI,
+		)
+	})
+
+	tests := []struct {
+		name     string
+		path     string
+		rawPath  string
+		expected string
+	}{
+		{
+			name:     "root user path",
+			path:     "/g/probe/%2F/86400",
+			expected: "%2F|86400|/probe/%2F/86400|/probe/%2F/86400",
+		},
+		{
+			name:     "nested user path",
+			path:     "/g/probe/%2Fteam%2Fbeta/604800",
+			expected: "%2Fteam%2Fbeta|604800|/probe/%2Fteam%2Fbeta/604800|/probe/%2Fteam%2Fbeta/604800",
+		},
+		{
+			name:     "encoded base path raw prefix",
+			path:     "/g/probe/%2F/86400",
+			rawPath:  "/%67/probe/%2F/86400",
+			expected: "%2F|86400|/probe/%2F/86400|/probe/%2F/86400",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodPut, tt.path, nil)
+			if tt.rawPath != "" {
+				req.URL.RawPath = tt.rawPath
+			}
+			rec := httptest.NewRecorder()
+
+			srv.ServeHTTP(rec, req)
+
+			if rec.Code != http.StatusOK {
+				t.Fatalf("status = %d, want %d; body=%s", rec.Code, http.StatusOK, rec.Body.String())
+			}
+			if got := rec.Body.String(); got != tt.expected {
+				t.Fatalf("body = %q, want %q", got, tt.expected)
+			}
+		})
+	}
+}
+
+func TestBasePathRejectsInvalidRawPathPrefix(t *testing.T) {
+	srv := New(&mockProvider{}, &Config{BasePath: "/g"})
+	srv.echo.PUT("/probe/:user_path/:period", func(c *echo.Context) error {
+		return c.NoContent(http.StatusOK)
+	})
+
+	tests := []struct {
+		name    string
+		rawPath string
+	}{
+		{
+			name:    "decoded raw path does not match base path",
+			rawPath: "/%2Fg/probe/%2F/86400",
+		},
+		{
+			name:    "encoded slash in raw base path segment",
+			rawPath: "/%67%2Fprobe/%2F/86400",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodPut, "/g/probe/%2F/86400", nil)
+			req.URL.RawPath = tt.rawPath
+			rec := httptest.NewRecorder()
+
+			srv.ServeHTTP(rec, req)
+
+			if rec.Code != http.StatusBadRequest {
+				t.Fatalf("status = %d, want %d; body=%s", rec.Code, http.StatusBadRequest, rec.Body.String())
+			}
+		})
+	}
+}
+
+func TestMetricsEndpointReturnsPrometheusFormat(t *testing.T) {
+	mock := &mockProvider{}
+	srv := New(mock, &Config{
+		MetricsEnabled:  true,
+		MetricsEndpoint: "/metrics",
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/metrics", nil)
+	rec := httptest.NewRecorder()
+
+	srv.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", rec.Code)
+	}
+
+	body := rec.Body.String()
+
+	// Check for Prometheus text format indicators
+	// Prometheus metrics should contain HELP and TYPE comments
+	if !strings.Contains(body, "# HELP") {
+		t.Error("response should contain Prometheus HELP comments")
+	}
+	if !strings.Contains(body, "# TYPE") {
+		t.Error("response should contain Prometheus TYPE comments")
+	}
+
+	// Check for standard Go runtime metrics that are always present
+	standardMetrics := []string{
+		"go_goroutines",
+		"go_gc_duration_seconds",
+		"go_memstats_alloc_bytes",
+		"process_cpu_seconds_total",
+	}
+
+	for _, metric := range standardMetrics {
+		if !strings.Contains(body, metric) {
+			t.Errorf("response should contain standard metric %q", metric)
+		}
+	}
+
+	// Check Content-Type header
+	contentType := rec.Header().Get("Content-Type")
+	if !strings.Contains(contentType, "text/plain") {
+		t.Errorf("expected Content-Type to contain text/plain, got %s", contentType)
+	}
+}
+
+func TestServerWithMetricsAndPublicEndpoints(t *testing.T) {
+	mock := &mockProvider{}
+	srv := New(mock, &Config{
+		MetricsEnabled:  true,
+		MetricsEndpoint: "/metrics",
+	})
+
+	t.Run("metrics endpoint is public", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/metrics", nil)
+		rec := httptest.NewRecorder()
+
+		srv.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusOK {
+			t.Errorf("expected status 200 for public metrics endpoint, got %d", rec.Code)
+		}
+	})
+
+	t.Run("health endpoint is public", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/health", nil)
+		rec := httptest.NewRecorder()
+
+		srv.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusOK {
+			t.Errorf("expected status 200 for public health endpoint, got %d", rec.Code)
+		}
+	})
+
+	t.Run("API endpoints are accessible without auth", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/v1/models", nil)
+		rec := httptest.NewRecorder()
+
+		srv.ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusOK {
+			t.Errorf("expected status 200, got %d", rec.Code)
+		}
+	})
+}
+
+func TestServer_ManagedAuthKeyUserPathOverridesHeaderBeforeWorkflowResolution(t *testing.T) {
+	mock := &mockProvider{
+		supportedModels: []string{"gpt-5-mini"},
+		providerTypes:   map[string]string{"gpt-5-mini": "openai"},
+		response: &core.ChatResponse{
+			ID:       "chatcmpl-test",
+			Object:   "chat.completion",
+			Model:    "gpt-5-mini",
+			Provider: "openai",
+			Choices: []core.Choice{
+				{
+					Index:        0,
+					FinishReason: "stop",
+					Message: core.ResponseMessage{
+						Role:    "assistant",
+						Content: "ok",
+					},
+				},
+			},
+		},
+	}
+
+	var capturedSelector core.WorkflowSelector
+	srv := New(mock, &Config{
+		WorkflowPolicyResolver: requestWorkflowPolicyResolverFunc(func(selector core.WorkflowSelector) (*core.ResolvedWorkflowPolicy, error) {
+			capturedSelector = selector
+			return nil, nil
+		}),
+	})
+
+	req := httptest.NewRequest(http.MethodPost, "/v1/chat/completions", strings.NewReader(`{"model":"gpt-5-mini","messages":[{"role":"user","content":"hi"}]}`))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set(core.UserPathHeader, "/team/from-header")
+	rec := httptest.NewRecorder()
+
+	srv.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", rec.Code)
+	}
+	if capturedSelector.UserPath != "/team/from-header" {
+		t.Fatalf("selector.UserPath = %q, want /team/from-header", capturedSelector.UserPath)
+	}
+}
+
+func TestHealthEndpointAlwaysAvailable(t *testing.T) {
+	tests := []struct {
+		name   string
+		config *Config
+	}{
+		{
+			name:   "nil config",
+			config: nil,
+		},
+		{
+			name: "metrics disabled",
+			config: &Config{
+				MetricsEnabled: false,
+			},
+		},
+		{
+			name: "metrics enabled",
+			config: &Config{
+				MetricsEnabled:  true,
+				MetricsEndpoint: "/metrics",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock := &mockProvider{}
+			srv := New(mock, tt.config)
+
+			req := httptest.NewRequest(http.MethodGet, "/health", nil)
+			rec := httptest.NewRecorder()
+
+			srv.ServeHTTP(rec, req)
+
+			if rec.Code != http.StatusOK {
+				t.Errorf("expected status 200, got %d", rec.Code)
+			}
+		})
+	}
+}
+
+func TestPprofEndpoint_Enabled(t *testing.T) {
+	mock := &mockProvider{}
+	srv := New(mock, &Config{PprofEnabled: true})
+
+	req := httptest.NewRequest(http.MethodGet, "/debug/pprof/", nil)
+	rec := httptest.NewRecorder()
+
+	srv.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("expected status 200, got %d", rec.Code)
+	}
+
+	body := rec.Body.String()
+	if !strings.Contains(body, "Types of profiles available:") {
+		t.Errorf("expected pprof index content, got: %s", body[:min(200, len(body))])
+	}
+	if !strings.Contains(body, "goroutine") {
+		t.Errorf("expected pprof index to list goroutine profile, got: %s", body[:min(200, len(body))])
+	}
+}
+
+func TestPprofEndpoint_Disabled(t *testing.T) {
+	mock := &mockProvider{}
+	srv := New(mock, &Config{PprofEnabled: false})
+
+	req := httptest.NewRequest(http.MethodGet, "/debug/pprof/", nil)
+	rec := httptest.NewRecorder()
+
+	srv.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusNotFound {
+		t.Errorf("expected status 404, got %d", rec.Code)
+	}
+}
+
+func TestPprofEndpoint_NilConfig(t *testing.T) {
+	mock := &mockProvider{}
+	srv := New(mock, nil)
+
+	req := httptest.NewRequest(http.MethodGet, "/debug/pprof/", nil)
+	rec := httptest.NewRecorder()
+
+	srv.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusNotFound {
+		t.Errorf("expected status 404, got %d", rec.Code)
+	}
+}
+
+func TestServerWithPprof(t *testing.T) {
+	mock := &mockProvider{}
+	srv := New(mock, &Config{
+		PprofEnabled: true,
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/debug/pprof/", nil)
+	rec := httptest.NewRecorder()
+
+	srv.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Errorf("expected status 200 for public pprof endpoint, got %d", rec.Code)
+	}
+}
+
+func TestProviderPassthroughRoute_EnabledByDefault(t *testing.T) {
+	mock := &mockProvider{
+		passthroughResponse: &core.PassthroughResponse{
+			StatusCode: http.StatusOK,
+			Headers: map[string][]string{
+				"Content-Type": {"application/json"},
+			},
+			Body: io.NopCloser(strings.NewReader(`{"ok":true}`)),
+		},
+	}
+	srv := New(mock, &Config{})
+
+	req := httptest.NewRequest(http.MethodPost, "/p/openai/responses", strings.NewReader(`{"model":"gpt-5-mini"}`))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	srv.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", rec.Code)
+	}
+	if got := mock.lastPassthroughProvider; got != "openai" {
+		t.Fatalf("provider = %q, want openai", got)
+	}
+
+	mock.lastPassthroughProvider = ""
+	mock.lastPassthroughReq = nil
+	mock.passthroughResponse = &core.PassthroughResponse{
+		StatusCode: http.StatusOK,
+		Headers: map[string][]string{
+			"Content-Type": {"application/json"},
+		},
+		Body: io.NopCloser(strings.NewReader(`{"ok":true}`)),
+	}
+
+	reqV1 := httptest.NewRequest(http.MethodPost, "/p/openai/v1/responses", strings.NewReader(`{"model":"gpt-5-mini"}`))
+	reqV1.Header.Set("Content-Type", "application/json")
+	recV1 := httptest.NewRecorder()
+
+	srv.ServeHTTP(recV1, reqV1)
+
+	if recV1.Code != http.StatusOK {
+		t.Fatalf("expected normalized v1 route status 200, got %d", recV1.Code)
+	}
+	if got := mock.lastPassthroughProvider; got != "openai" {
+		t.Fatalf("normalized v1 provider = %q, want openai", got)
+	}
+}
+
+func TestProviderPassthroughRoute_DisabledReturns404(t *testing.T) {
+	mock := &mockProvider{}
+	srv := New(mock, &Config{
+		DisablePassthroughRoutes: true,
+	})
+
+	req := httptest.NewRequest(http.MethodPost, "/p/openai/responses", strings.NewReader(`{"model":"gpt-5-mini"}`))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	srv.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusNotFound {
+		t.Fatalf("expected status 404, got %d", rec.Code)
+	}
+	if mock.lastPassthroughProvider != "" || mock.lastPassthroughReq != nil {
+		t.Fatal("passthrough handler should not be invoked when provider passthrough is disabled")
+	}
+}

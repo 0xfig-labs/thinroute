@@ -1,0 +1,52 @@
+repos:
+  # 1. Standard hooks for file hygiene (trailing whitespace, newlines, etc.)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0 # Latest as of this update (Aug 9, 2025)
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        exclude: ^helm/templates/
+      - id: check-json
+      - id: check-added-large-files
+
+  # 2. Go-specific hooks for formatting and tidying
+  # The pre-commit-golang repo has a v1.0.0+ fork which is more actively maintained.
+  - repo: https://github.com/Bahjat/pre-commit-golang
+    rev: v1.0.6
+    hooks:
+      - id: go-fmt-import # Runs goimports + gofmt on staged .go files
+
+  # 2b. Go module tidying (local hook)
+  - repo: local
+    hooks:
+      - id: go-unit-tests
+        name: make test-race
+        entry: make test-race
+        language: system
+        pass_filenames: false
+        files: '^((cmd|config|internal)/.*\.go|go\.(mod|sum)|Makefile|\.github/workflows/test\.yml)$'
+      - id: go-mod-tidy
+        name: go mod tidy
+        entry: go mod tidy
+        language: system
+        pass_filenames: false
+        files: '(\.go$|^go\.(mod|sum)$)'
+      - id: perf-hotpath-guard
+        name: hot-path performance guard (alloc/byte thresholds)
+        entry: make perf-check
+        language: system
+        pass_filenames: false
+        files: '^(internal/(auditlog|core|providers|server|usage)/.*\.go|tests/perf/.*\.go|Makefile|\.github/workflows/test\.yml)$'
+      - id: go-lint
+        name: make lint
+        entry: make lint
+        language: system
+        pass_filenames: false
+        files: '^(\.golangci\.yml|Makefile|\.github/workflows/test\.yml|.*\.go)$'
+      - id: mint-validate
+        name: mint validate
+        entry: bash -c 'if command -v mint >/dev/null 2>&1; then cd docs && mint validate; else echo "mint not found; skipping docs validation"; fi'
+        language: system
+        pass_filenames: false
+        files: '^(docs/(docs\.json|openapi\.json|.*\.(mdx|md|jsx|tsx|css|svg|png|jpg|jpeg|webp))|\.pre-commit-config\.yaml)$'

@@ -1,0 +1,8 @@
+server:
+  port: "52180"
+
+models:
+  disable_reasoning:
+    - deepseek/deepseek-v4-flash
+
+# Providers can be added with thinroute or declared here.
