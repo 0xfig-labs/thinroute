@@ -38,6 +38,17 @@ archives:
 
 checksum:
   name_template: "checksums.txt"
+brews:
+  - name: thinroute
+    repository:
+      owner: 0xfig-labs
+      name: homebrew-tap
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/0xfig-labs/thinroute"
+    description: "A local-first, OpenAI-compatible LLM gateway"
+    license: "MIT"
+
 
 release:
   replace_existing_draft: true
