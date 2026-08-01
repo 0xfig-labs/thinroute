@@ -119,10 +119,8 @@ func buildDefaultConfig() *Config {
 
 // Load reads configuration from file and environment.
 //
-// Priority: explicit configPath > THINROUTE_CONFIG env var > config.yaml > defaults.
-// When configPath is empty, THINROUTE_CONFIG is checked; when both are empty,
-// config.yaml in the working directory is tried. If no file is found, defaults
-// and environment variables are used.
+// Priority: explicit configPath > THINROUTE_CONFIG > user config > legacy config paths > defaults.
+// When no file is found, defaults and environment variables are used.
 //
 // The returned LoadResult contains the resolved application Config and the raw
 // provider map parsed from YAML. Provider env var discovery, credential filtering,
@@ -180,8 +178,7 @@ func Load(configPath ...string) (*LoadResult, error) {
 	}, nil
 }
 
-// resolveConfigPath returns the config file path using the priority:
-// explicit arg > THINROUTE_CONFIG env var > config.yaml.
+// resolveConfigPath returns an explicit path or the THINROUTE_CONFIG value.
 func resolveConfigPath(explicitPath ...string) string {
 	if len(explicitPath) > 0 && explicitPath[0] != "" {
 		return explicitPath[0]
@@ -192,12 +189,14 @@ func resolveConfigPath(explicitPath ...string) string {
 	return ""
 }
 
-// configFilePaths are searched in order when no explicit path is given;
-// the first readable file wins.
-var configFilePaths = []string{
-	"config/config.yaml",
-	"config.yaml",
-}
+// configFilePaths are searched in order when no explicit path is given.
+var configFilePaths = func() []string {
+	paths := make([]string, 0, 3)
+	if path := DefaultConfigPath(); path != "" {
+		paths = append(paths, path)
+	}
+	return append(paths, "config/config.yaml", "config.yaml")
+}()
 
 // envConfigStrict is the env var name for CONFIG_STRICT.
 const envConfigStrict = "CONFIG_STRICT"

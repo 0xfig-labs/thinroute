@@ -2,15 +2,20 @@ package command
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/0xfig-labs/thinroute/config"
-	"github.com/0xfig-labs/thinroute/internal/core"
-	"github.com/0xfig-labs/thinroute/internal/usage"
 	"os"
+	"os/exec"
+	"strings"
 	"time"
 
+	"github.com/0xfig-labs/thinroute/config"
+	"github.com/0xfig-labs/thinroute/internal/apikeys"
+	"github.com/0xfig-labs/thinroute/internal/core"
 	"github.com/0xfig-labs/thinroute/internal/providers"
+	"github.com/0xfig-labs/thinroute/internal/storage"
+	"github.com/0xfig-labs/thinroute/internal/usage"
 	"github.com/0xfig-labs/thinroute/run"
 	"github.com/urfave/cli/v2"
 )
@@ -29,7 +34,7 @@ func Run(args []string) error {
 			managementConfigPath = c.String("config")
 			return nil
 		},
-		Commands: []*cli.Command{configCmd(), usageCmd(), providersCmd(), modelsCmd(), virtualModelsCmd(), doctorCmd()},
+		Commands: []*cli.Command{configCmd(), usageCmd(), providersCmd(), modelsCmd(), virtualModelsCmd(), authKeysCmd(), doctorCmd()},
 	}
 	return app.Run(args)
 }
@@ -41,7 +46,7 @@ func configCmd() *cli.Command {
 		Subcommands: []*cli.Command{
 			{
 				Name:  "validate",
-				Usage: "Validate config.yaml",
+				Usage: "Validate the selected config",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{Name: "strict", Usage: "Treat unknown fields as errors", Value: true},
 				},
@@ -57,8 +62,76 @@ func configCmd() *cli.Command {
 					return nil
 				},
 			},
+			{
+				Name:  "path",
+				Usage: "Print the default config path",
+				Action: func(*cli.Context) error {
+					fmt.Println(config.DefaultConfigPath())
+					return nil
+				},
+			},
+			{
+				Name:  "init",
+				Usage: "Create the default config from the example",
+				Action: func(*cli.Context) error {
+					path, err := config.InitDefaultConfig()
+					if err != nil {
+						return err
+					}
+					fmt.Printf("created %s\n", path)
+					return nil
+				},
+			},
+			{
+				Name:  "example",
+				Usage: "Print or write the built-in config example",
+				Flags: []cli.Flag{
+					&cli.StringFlag{Name: "output", Aliases: []string{"o"}, Usage: "Write the example to this path"},
+				},
+				Action: func(c *cli.Context) error {
+					data := config.ExampleConfig()
+					if path := c.String("output"); path != "" {
+						if err := os.WriteFile(path, data, 0o600); err != nil {
+							return fmt.Errorf("write config example: %w", err)
+						}
+						fmt.Printf("wrote %s\n", path)
+						return nil
+					}
+					_, err := os.Stdout.Write(data)
+					return err
+				},
+			},
+			{
+				Name:  "edit",
+				Usage: "Edit the default config with $EDITOR",
+				Action: func(*cli.Context) error {
+					path := config.DefaultConfigPath()
+					if _, err := os.Stat(path); os.IsNotExist(err) {
+						if _, err := config.InitDefaultConfig(); err != nil {
+							return err
+						}
+					} else if err != nil {
+						return err
+					}
+					editor := os.Getenv("EDITOR")
+					if editor == "" {
+						editor = "vi"
+					}
+					return runEditor(editor, path)
+				},
+			},
 		},
 	}
+}
+
+func runEditor(editor, path string) error {
+	parts := strings.Fields(editor)
+	if len(parts) == 0 {
+		return fmt.Errorf("$EDITOR is empty")
+	}
+	cmd := exec.Command(parts[0], append(parts[1:], path)...)
+	cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, os.Stdout, os.Stderr
+	return cmd.Run()
 }
 func usageCmd() *cli.Command {
 	return &cli.Command{
@@ -119,6 +192,81 @@ func usageCmd() *cli.Command {
 			return nil
 		},
 	}
+}
+func authKeysCmd() *cli.Command {
+	return &cli.Command{
+		Name: "auth", Usage: "Manage inbound API keys",
+		Subcommands: []*cli.Command{
+			{
+				Name: "keys", Usage: "Manage API keys",
+				Subcommands: []*cli.Command{
+					{
+						Name: "create", Usage: "Create an API key",
+						Flags: []cli.Flag{&cli.StringFlag{Name: "name", Value: "default"}},
+						Action: func(c *cli.Context) error {
+							store, close, err := openAPIKeyStore()
+							if err != nil {
+								return err
+							}
+							defer close()
+							key, err := store.Create(c.String("name"))
+							if err != nil {
+								return err
+							}
+							fmt.Printf("ID: %s\nName: %s\nKey: %s\n", key.ID, key.Name, key.Key)
+							return nil
+						},
+					},
+					{
+						Name: "list", Usage: "List API keys",
+						Action: func(c *cli.Context) error {
+							store, close, err := openAPIKeyStore()
+							if err != nil {
+								return err
+							}
+							defer close()
+							keys, err := store.List()
+							if err != nil {
+								return err
+							}
+							return json.NewEncoder(os.Stdout).Encode(keys)
+						},
+					},
+					{
+						Name: "revoke", Usage: "Revoke an API key", ArgsUsage: "<id>",
+						Action: func(c *cli.Context) error {
+							if c.NArg() != 1 {
+								return fmt.Errorf("key id is required")
+							}
+							store, close, err := openAPIKeyStore()
+							if err != nil {
+								return err
+							}
+							defer close()
+							return store.Revoke(c.Args().First())
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func openAPIKeyStore() (*apikeys.Store, func() error, error) {
+	loaded, err := config.Load(managementConfigPath)
+	if err != nil {
+		return nil, nil, err
+	}
+	raw, err := storage.New(context.Background(), loaded.Config.Storage.BackendConfig())
+	if err != nil {
+		return nil, nil, err
+	}
+	store, err := storage.ResolveBackend(raw, func(db *sql.DB) (*apikeys.Store, error) { return apikeys.New(db) })
+	if err != nil {
+		_ = raw.Close()
+		return nil, nil, err
+	}
+	return store, raw.Close, nil
 }
 
 func valueOrZero(value *float64) float64 {

@@ -9,7 +9,7 @@ Requires Go 1.26 or later.
 ```bash
 git clone https://github.com/0xfig-labs/thinroute.git
 cd thinroute
-cp config.example.yaml config.yaml
+go run ./cmd/thinroute config init
 # Set provider credentials via environment variables, e.g.:
 #   export OPENAI_API_KEY=sk-...
 #   export ANTHROPIC_API_KEY=sk-ant-...
@@ -26,14 +26,37 @@ make build
 
 ## Configuration
 
+- Default: `~/.config/thinroute/config.yaml` (or `$XDG_CONFIG_HOME/thinroute/config.yaml`)
 - Example: [`config.example.yaml`](config.example.yaml)
+- Create: `thinroute config init`
+- Edit: `thinroute config edit`
+- Print path: `thinroute config path`
+- Print example: `thinroute config example`
 - Validate: `thinroute config validate`
-- Provider credentials are set via system environment variables, referenced in `config.yaml` as `${VAR}`. Credentials never live in the config file.
+- Provider credentials are set via system environment variables, referenced in `config.yaml` as `${VAR}`.
+
+Create and manage inbound API keys:
+
+```bash
+thinroute auth keys create --name my-client
+thinroute auth keys list
+thinroute auth keys revoke <id>
+```
+
+Use the generated key as a standard OpenAI-compatible client key:
+
+```bash
+export OPENAI_API_KEY=tr_...
+```
+
+`/health` and `/health/ready` are public. Other gateway API routes require
+`Authorization: Bearer <API_KEY>`.
 
 Do not commit `config.yaml`, API keys, database files, or build artifacts.
 
+Other useful commands:
+
 ```bash
-thinroute config validate
 thinroute usage [--days 7] [--json]
 thinroute providers status
 thinroute models list [--json]
@@ -70,7 +93,7 @@ thinroute implements a subset of the OpenAI API. The following endpoints are sup
 | `GET /v1/conversations/{id}` | Retrieve a conversation |
 | `DELETE /v1/conversations/{id}` | Delete a conversation |
 
-Endpoints not listed above (e.g., embeddings, fine-tuning, assistants, moderations, audio) are not supported. thinroute does not claim full OpenAI API compatibility.
+Endpoints not listed above (for example fine-tuning, assistants, and moderations) are not supported. thinroute does not claim full OpenAI API compatibility.
 
 ## Client Integration
 
