@@ -4,6 +4,7 @@ package app
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/0xfig-labs/thinroute/config"
 	"github.com/0xfig-labs/thinroute/ext"
+	"github.com/0xfig-labs/thinroute/internal/apikeys"
 	"github.com/0xfig-labs/thinroute/internal/auditlog"
 	"github.com/0xfig-labs/thinroute/internal/batch"
 	"github.com/0xfig-labs/thinroute/internal/control"
@@ -163,6 +165,12 @@ func New(ctx context.Context, cfg Config) (*App, error) {
 	app.usage = usageResult
 	closers = append(closers, app.usage.Close)
 	claimSharedStorage(usageResult.Storage)
+	apiKeyStore, err := storage.ResolveBackend(sharedStorage, func(db *sql.DB) (*apikeys.Store, error) {
+		return apikeys.New(db)
+	})
+	if err != nil {
+		return fail("failed to initialize API key storage", err)
+	}
 
 	// Initialize batch lifecycle storage.
 	var batchResult *batch.Result
@@ -276,7 +284,7 @@ func New(ctx context.Context, cfg Config) (*App, error) {
 	serverCfg := &server.Config{
 		BasePath:                        appCfg.Server.BasePath,
 		MetricsEnabled:                  appCfg.Metrics.Enabled,
-		MetricsEndpoint:                 appCfg.Metrics.Endpoint,
+		InboundAPIKeys:                  apiKeyStore,
 		BodySizeLimit:                   appCfg.Server.BodySizeLimit,
 		PprofEnabled:                    appCfg.Server.PprofEnabled,
 		AuditLogger:                     auditResult.Logger,

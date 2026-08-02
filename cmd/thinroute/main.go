@@ -38,6 +38,7 @@ func isManagementCommand(args []string) bool {
 		"providers":      {},
 		"models":         {},
 		"virtual-models": {},
+		"auth":           {},
 		"doctor":         {},
 	}
 	for _, arg := range args {

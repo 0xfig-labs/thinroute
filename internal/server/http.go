@@ -18,6 +18,7 @@ import (
 	"github.com/labstack/echo/v5/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
+	"github.com/0xfig-labs/thinroute/internal/apikeys"
 	"github.com/0xfig-labs/thinroute/internal/auditlog"
 	batchstore "github.com/0xfig-labs/thinroute/internal/batch"
 	"github.com/0xfig-labs/thinroute/internal/conversationstore"
@@ -27,6 +28,10 @@ import (
 	"github.com/0xfig-labs/thinroute/internal/responsestore"
 	"github.com/0xfig-labs/thinroute/internal/usage"
 )
+
+type apiKeyAuthenticator interface {
+	Authenticate(string) bool
+}
 
 // Server wraps the Echo server
 type Server struct {
@@ -45,45 +50,46 @@ const (
 
 // Config holds server configuration options
 type Config struct {
-	BasePath                        string                                 // URL path prefix where the app is mounted (default: /)
-	MetricsEnabled                  bool                                   // Whether to expose Prometheus metrics endpoint
-	MetricsEndpoint                 string                                 // HTTP path for metrics endpoint (default: /metrics)
-	BodySizeLimit                   string                                 // Max request body size (e.g., "10M", "1024K")
-	PprofEnabled                    bool                                   // Whether to expose debug profiling routes at /debug/pprof/*
-	AuditLogger                     auditlog.LoggerInterface               // Optional: Audit logger for request/response logging
-	UsageLogger                     usage.LoggerInterface                  // Optional: Usage logger for token tracking
-	BudgetChecker                   BudgetChecker                          // Optional: per-user-path budget checker
-	UsageSummarizer                 UsageSummarizer                        // Optional: usage aggregates for the self-service GET /v1/usage endpoint
-	PricingResolver                 usage.PricingResolver                  // Optional: Resolves pricing for cost calculation
-	ModelResolver                   RequestModelResolver                   // Optional: explicit model resolver used during workflow resolution
-	ModelAuthorizer                 RequestModelAuthorizer                 // Optional: request-scoped concrete model access controller
-	WorkflowPolicyResolver          RequestWorkflowPolicyResolver          // Optional: persisted workflow resolver used during workflow resolution
-	FailoverResolver                RequestFailoverResolver                // Optional: translated-route failover resolver
-	TranslatedRequestPatcher        TranslatedRequestPatcher               // Optional: request patcher for translated routes after workflow resolution
-	BatchRequestPreparer            BatchRequestPreparer                   // Optional: batch request preparer before native provider submission
-	ExposedModelLister              ExposedModelLister                     // Optional: additional public models to merge into GET /v1/models
-	KeepOnlyAliasesAtModelsEndpoint bool                                   // Whether GET /v1/models should hide concrete provider models
-	PassthroughSemanticEnrichers    []core.PassthroughSemanticEnricher     // Optional: provider-owned passthrough semantic enrichers before workflow resolution
-	BatchStore                      batchstore.Store                       // Optional: Batch lifecycle persistence store
-	FileStore                       filestore.Store                        // Optional: File provider mapping persistence store
-	ResponseStore                   responsestore.Store                    // Optional: Responses lifecycle persistence store
-	ConversationStore               conversationstore.Store                // Optional: Conversations lifecycle persistence store
-	LogOnlyModelInteractions        bool                                   // Only log AI model endpoints (default: true)
-	DisablePassthroughRoutes        bool                                   // Disable /p/{provider}/{endpoint} route registration
-	RealtimeEnabled                 bool                                   // Enable realtime websocket route /v1/realtime and passthrough upgrades
-	DisableReasoningModels          []string                               // Concrete and virtual model selectors with reasoning disabled
-	EnabledPassthroughProviders     []string                               // Provider types enabled on /p/{provider}/... passthrough routes
-	AllowPassthroughV1Alias         *bool                                  // Allow /p/{provider}/v1/... aliases; nil defaults to true
-	UserPathHeader                  string                                 // Header carrying the request user path (default: X-thinroute-User-Path)
-	ResponseCacheMiddleware         *responsecache.ResponseCacheMiddleware // Optional: response cache middleware for cacheable endpoints
-	GuardrailsHash                  string                                 // Optional: SHA-256 hash of active guardrail rules; stored in context post-patch
-	IPExtractor                     echo.IPExtractor                       // Optional: trusted client IP extraction strategy for proxied deployments
-	StorageProbe                    ReadinessProbe                         // Optional: primary storage connectivity check; failure makes /health/ready report not_ready (503)
-	CacheProbe                      ReadinessProbe                         // Optional: response cache connectivity check; failure makes /health/ready report degraded (200, non-blocking)
-	RequestRewriters                []ext.RequestRewriter                  // Optional: raw-body rewriters invoked on inference ingress (post-auth, pre-workflow-resolution)
-	ExtraMiddleware                 []echo.MiddlewareFunc                  // Optional: extension middleware registered after audit, before gateway auth
-	ExtraRoutes                     []func(*echo.Echo)                     // Optional: extension route registration callbacks invoked after core routes
-	ExtraAuthSkipPaths              []string                               // Optional: extension paths appended to the auth skip list ("/*" suffix matches a prefix)
+	BasePath                        string
+	MetricsEnabled                  bool
+	MetricsEndpoint                 string
+	BodySizeLimit                   string
+	PprofEnabled                    bool
+	InboundAPIKeys                  *apikeys.Store
+	AuditLogger                     auditlog.LoggerInterface
+	UsageLogger                     usage.LoggerInterface
+	BudgetChecker                   BudgetChecker
+	UsageSummarizer                 UsageSummarizer
+	PricingResolver                 usage.PricingResolver
+	ModelResolver                   RequestModelResolver
+	ModelAuthorizer                 RequestModelAuthorizer
+	WorkflowPolicyResolver          RequestWorkflowPolicyResolver
+	FailoverResolver                RequestFailoverResolver
+	TranslatedRequestPatcher        TranslatedRequestPatcher
+	BatchRequestPreparer            BatchRequestPreparer
+	ExposedModelLister              ExposedModelLister
+	KeepOnlyAliasesAtModelsEndpoint bool
+	PassthroughSemanticEnrichers    []core.PassthroughSemanticEnricher
+	BatchStore                      batchstore.Store
+	FileStore                       filestore.Store
+	ResponseStore                   responsestore.Store
+	ConversationStore               conversationstore.Store
+	LogOnlyModelInteractions        bool
+	DisablePassthroughRoutes        bool
+	RealtimeEnabled                 bool
+	DisableReasoningModels          []string
+	EnabledPassthroughProviders     []string
+	AllowPassthroughV1Alias         *bool
+	UserPathHeader                  string
+	ResponseCacheMiddleware         *responsecache.ResponseCacheMiddleware
+	GuardrailsHash                  string
+	IPExtractor                     echo.IPExtractor
+	StorageProbe                    ReadinessProbe
+	CacheProbe                      ReadinessProbe
+	RequestRewriters                []ext.RequestRewriter
+	ExtraMiddleware                 []echo.MiddlewareFunc
+	ExtraRoutes                     []func(*echo.Echo)
+	ExtraAuthSkipPaths              []string
 }
 
 // ReadinessProbe verifies that a dependency the gateway owns is reachable.
@@ -275,6 +281,11 @@ func New(provider core.RoutableProvider, cfg *Config) *Server {
 
 	// Request rewriters run post-auth (rewriters only see authenticated
 	// traffic) and pre-workflow-resolution (body rewrites, including "model",
+
+	if cfg != nil && cfg.InboundAPIKeys != nil {
+		e.Use(inboundAPIKeyMiddleware(cfg.InboundAPIKeys))
+	}
+
 	// affect routing, failover, guardrails, budgets, and caching). Not
 	// registered when no rewriters exist, so the default build pays nothing.
 	if cfg != nil && len(cfg.RequestRewriters) > 0 {
@@ -483,4 +494,20 @@ func parseBodySizeLimitBytes(limit string) int64 {
 	}
 
 	return value
+}
+func inboundAPIKeyMiddleware(store interface{ Authenticate(string) bool }) echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c *echo.Context) error {
+			path := c.Request().URL.Path
+			if path == "/health" || path == "/health/ready" {
+				return next(c)
+			}
+			auth := strings.TrimSpace(c.Request().Header.Get("Authorization"))
+			scheme, value, ok := strings.Cut(auth, " ")
+			if !ok || !strings.EqualFold(scheme, "Bearer") || !store.Authenticate(value) {
+				return echo.NewHTTPError(http.StatusUnauthorized, "missing or invalid API key")
+			}
+			return next(c)
+		}
+	}
 }
