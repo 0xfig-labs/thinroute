@@ -1,8 +1,31 @@
 server:
-  port: "52180"
+  listen: "127.0.0.1:52180"
+  enabled_passthrough_providers: ["openai", "anthropic", "openrouter", "zai", "vllm", "deepseek", "bailian", "agnes"]
 
 models:
   disable_reasoning:
     - deepseek/deepseek-v4-flash
 
 # Providers can be added with thinroute or declared here.
+
+providers:
+  agnes:
+    type: openai
+    api_key: ${AGNES_API_KEY}
+    base_url: https://apihub.agnes-ai.com/v1
+    models:
+      - id: agnes-2.5-flash
+        metadata:
+          capabilities:
+            vision: true
+            tools: true
+      - id: agnes-image-2.1-flash
+        metadata:
+          modes: ["image_generation", "image_edit"]
+          categories: ["image"]
+
+virtual_models:
+  - source: smart
+    target: agnes/agnes-2.5-flash
+  - source: image
+    target: agnes/agnes-image-2.1-flash

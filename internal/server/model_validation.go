@@ -103,7 +103,7 @@ func deriveWorkflowWithPolicy(
 		}
 		return workflow, nil
 
-	case core.OperationChatCompletions, core.OperationResponses, core.OperationEmbeddings:
+	case core.OperationChatCompletions, core.OperationResponses, core.OperationEmbeddings, core.OperationImageGenerations:
 		workflow.Mode = core.ExecutionModeTranslated
 		resolution, parsed, err := ensureRequestModelResolution(c, provider, resolver)
 		if err != nil {

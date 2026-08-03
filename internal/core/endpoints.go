@@ -23,6 +23,7 @@ const (
 	OperationResponses           Operation = "responses"
 	OperationConversations       Operation = "conversations"
 	OperationEmbeddings          Operation = "embeddings"
+	OperationImageGenerations    Operation = "image_generations"
 	OperationBatches             Operation = "batches"
 	OperationFiles               Operation = "files"
 	OperationAudioSpeech         Operation = "audio_speech"
@@ -90,13 +91,19 @@ func describeEndpointPath(path string) EndpointDescriptor {
 			Dialect:          "openai_compat",
 			Operation:        OperationEmbeddings,
 		}
+	case path == "/v1/images/generations":
+		return EndpointDescriptor{
+			ModelInteraction: true,
+			IngressManaged:   true,
+			Dialect:          "openai_compat",
+			Operation:        OperationImageGenerations,
+		}
 	case path == "/v1/messages" || path == "/v1/messages/count_tokens":
 		// Anthropic Messages dialect. It is translated to the canonical chat
 		// type at ingress and runs through the chat-completions pipeline, so it
 		// is classified as a chat-completions operation (see ADR-0007).
 		return EndpointDescriptor{
 			ModelInteraction: true,
-			IngressManaged:   true,
 			Dialect:          "anthropic",
 			Operation:        OperationChatCompletions,
 		}
@@ -160,7 +167,7 @@ func bodyModeForEndpoint(method, path string, operation Operation) BodyMode {
 	path = normalizeEndpointPath(path)
 
 	switch operation {
-	case OperationChatCompletions, OperationEmbeddings:
+	case OperationChatCompletions, OperationEmbeddings, OperationImageGenerations:
 		return BodyModeJSON
 	case OperationResponses:
 		if method == http.MethodPost && (path == "/v1/responses" || path == "/v1/responses/input_tokens" || path == "/v1/responses/compact") {
