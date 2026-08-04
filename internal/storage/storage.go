@@ -49,22 +49,17 @@ type SQLiteStorage interface {
 	DB() *sql.DB
 }
 
-// ResolveBackend dispatches to the callback matching the concrete storage backend.
-func ResolveBackend[T any](
-	store Storage,
-	sqlite func(*sql.DB) (T, error),
-) (T, error) {
+// ResolveBackend invokes fn with the database handle of the configured SQLite store.
+func ResolveBackend[T any](store Storage, fn func(*sql.DB) (T, error)) (T, error) {
 	var zero T
-
-	switch store := store.(type) {
-	case SQLiteStorage:
-		if sqlite == nil {
-			return zero, fmt.Errorf("sqlite handler is nil")
-		}
-		return sqlite(store.DB())
-	default:
+	sqlite, ok := store.(SQLiteStorage)
+	if !ok {
 		return zero, fmt.Errorf("unsupported storage backend %T", store)
 	}
+	if fn == nil {
+		return zero, fmt.Errorf("sqlite handler is nil")
+	}
+	return fn(sqlite.DB())
 }
 
 // New creates a new Storage based on the configuration.

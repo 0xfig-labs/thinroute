@@ -115,18 +115,13 @@ func NewReader(store storage.Storage) (UsageReader, error) {
 		return nil, nil
 	}
 
-	return storage.ResolveBackend[UsageReader](
-		store,
-		func(db *sql.DB) (UsageReader, error) { return NewSQLiteReader(db) },
-	)
+	return storage.ResolveBackend(store, func(db *sql.DB) (UsageReader, error) { return NewSQLiteReader(db) })
 }
 
-// createUsageStore creates the appropriate UsageStore for the given storage backend.
 func createUsageStore(store storage.Storage, retentionDays int) (UsageStore, error) {
-	return storage.ResolveBackend[UsageStore](
-		store,
-		func(db *sql.DB) (UsageStore, error) { return NewSQLiteStore(db, retentionDays) },
-	)
+	return storage.ResolveBackend(store, func(db *sql.DB) (UsageStore, error) {
+		return NewSQLiteStore(db, retentionDays)
+	})
 }
 
 // buildLoggerConfig creates a usage.Config from config.UsageConfig.

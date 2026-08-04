@@ -33,8 +33,8 @@ uranium-geryon-9b:
 		{
 			name: "unknown top-level key",
 			yaml: "bogus_section:\n  a: 1\n",
-			// Reported against the file, without yaml.v3's internal Go type name.
-			wantErr: "failed to parse config.yaml: line 1: field bogus_section not found",
+			// Reported against the selected file, without yaml.v3's internal Go type name.
+			wantErr: "field bogus_section not found",
 		},
 		{
 			name:    "unknown nested key",
@@ -52,8 +52,8 @@ uranium-geryon-9b:
 		t.Run(tt.name, func(t *testing.T) {
 			clearAllConfigEnvVars(t)
 			withTempDir(t, func(dir string) {
+				t.Setenv("THINROUTE_CONFIG", filepath.Join(dir, "config.yaml"))
 				writeConfigYAML(t, dir, tt.yaml)
-
 				_, err := Load()
 				if err == nil {
 					t.Fatal("Load() succeeded, want unknown-field error")
@@ -93,8 +93,8 @@ func TestLoad_AcceptsValidYAMLShapes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			clearAllConfigEnvVars(t)
 			withTempDir(t, func(dir string) {
+				t.Setenv("THINROUTE_CONFIG", filepath.Join(dir, "config.yaml"))
 				writeConfigYAML(t, dir, tt.yaml)
-
 				result, err := Load()
 				if err != nil {
 					t.Fatalf("Load() failed: %v", err)

@@ -68,8 +68,5 @@ func NewWithSharedStorage(ctx context.Context, shared storage.Storage) (*Result,
 }
 
 func createStore(ctx context.Context, store storage.Storage) (Store, error) {
-	return storage.ResolveBackend[Store](
-		store,
-		func(db *sql.DB) (Store, error) { return NewSQLiteStore(db) },
-	)
+	return storage.ResolveBackend(store, func(db *sql.DB) (Store, error) { return NewSQLiteStore(db) })
 }

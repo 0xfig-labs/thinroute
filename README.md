@@ -2,7 +2,7 @@
 
 thinroute is a local-first, OpenAI-compatible LLM gateway: a single entry point that routes requests across multiple AI providers, with model discovery, exact-match response caching, lightweight usage tracking, and Prometheus metrics.
 
-> Single-machine, single-user, SQLite-only. All configuration lives in `config.yaml` and system environment variables — no `.env` files, no dashboard, no inbound authentication.
+> Single-machine, single-user, SQLite-only. Configuration lives in `config.yaml` and system environment variables — no `.env` files, no dashboard. The gateway API uses inbound API keys; `/health` and `/health/ready` remain public.
 
 Requires Go 1.26 or later.
 
@@ -141,7 +141,7 @@ make lint
 
 ## Security Boundaries
 
-thinroute binds to loopback (`127.0.0.1`) by default and requires no inbound authentication. Binding to a non-loopback address exposes the gateway to the network without authentication — only do this in a trusted or reverse-proxied environment, and manage downstream provider credentials carefully.
+thinroute binds to loopback (`127.0.0.1`) by default. `/health` and `/health/ready` are public; other gateway API routes require a generated inbound API key. Binding to a non-loopback address still exposes the gateway to the network, so use a trusted or reverse-proxied environment and manage downstream provider credentials carefully.
 
 When reporting security issues, do not include API keys, logs, or request bodies.
 
